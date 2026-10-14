@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f4ef">
+<title>5つの軸で知る、自分の傾向診断</title>
+<style>
+:root{--bg:#f7f4ef;--paper:#fffdf9;--ink:#282722;--muted:#716f68;--line:#e5dfd5;--accent:#6654a3;--accent-soft:#eee9f8;--good:#e8f1e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.65}
+main{width:min(760px,100%);margin:auto;padding:24px 16px 56px}.hero{padding:28px 22px;background:var(--paper);border:1px solid var(--line);border-radius:22px}
+.eyebrow{font-size:.78rem;letter-spacing:.12em;color:var(--accent);font-weight:700}.hero h1{font-size:clamp(1.7rem,6vw,2.5rem);line-height:1.3;margin:.5rem 0 1rem}.hero p{margin:.5rem 0;color:#55534d}
+.panel{margin-top:16px;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px}
+h2{font-size:1.2rem;margin:0 0 10px}h3{font-size:1rem;margin:0 0 8px}.muted{color:var(--muted);font-size:.9rem}.axis-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.axis{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.axis b{display:block}.axis small{color:var(--muted)}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 16px;background:var(--accent);color:white;font-weight:650}.button-secondary{background:white;color:var(--ink);border:1px solid var(--line)}button:disabled{opacity:.4;cursor:not-allowed}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.progress-wrap{height:7px;background:#e9e4dc;border-radius:9px;overflow:hidden;margin:10px 0 18px}.progress{height:100%;width:0;background:var(--accent);transition:width .15s}
+.question{font-size:1.12rem;font-weight:650;margin:8px 0 18px}.answers{display:grid;gap:9px}.answer{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:white;cursor:pointer}.answer:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}.answer input{accent-color:var(--accent);width:18px;height:18px;flex-shrink:0}
+.result-code{font-size:clamp(2rem,8vw,3.4rem);letter-spacing:.12em;font-weight:800;color:var(--accent);line-height:1.2;overflow-wrap:anywhere}.type-name{font-size:1.55rem;font-weight:750;margin:8px 0}.tagline{font-size:1.05rem}.result-axis{padding:12px 0;border-bottom:1px solid var(--line)}.result-axis:last-child{border-bottom:0}.pill{display:inline-block;background:var(--accent-soft);color:#514080;padding:3px 9px;border-radius:99px;font-size:.8rem;font-weight:700}.hidden{display:none!important}.warning{font-size:.84rem;color:var(--muted)}footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.8rem}
+@media(max-width:520px){main{padding:12px 11px 36px}.hero{padding:23px 17px}.panel{padding:16px}.axis-list{grid-template-columns:1fr}.actions button{flex:1 1 140px}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+  <div class="eyebrow">ORIGINAL SELF-REFLECTION TEST</div>
+  <h1>5つの軸で知る、<br>自分の傾向診断</h1>
+  <p>50の質問への回答から、あなたの傾向を5つの軸で整理します。結果は5文字のコードとタイプ名で表示されます。</p>
+  <p class="warning">この診断は自己理解を目的としたオリジナルの試作版であり、科学的に検証された心理検査・医学的診断ではありません。結果から性自認、性的指向、人格などを断定することはできません。</p>
+</section>
+
+<section class="panel" id="intro">
+  <h2>診断する5つの軸</h2>
+  <div class="axis-list">
+    <div class="axis"><b>A｜性別に関する違和感・探索</b><small>C：安定・低探索 ／ T：違和感・探索</small></div>
+    <div class="axis"><b>N｜女性美・外見追求</b><small>B：控えめ ／ F：積極的に追求</small></div>
+    <div class="axis"><b>J｜自己表現・承認志向</b><small>P：自己完結 ／ O：承認志向</small></div>
+    <div class="axis"><b>G｜自己女性化イメージと性的興奮</b><small>I：結びつき弱め ／ E：結びつき強め</small></div>
+    <div class="axis"><b>H｜男性性への態度</b><small>A：受容 ／ R：違和感・回避</small></div>
+  </div>
+  <p class="muted">目安時間：約5〜8分。回答はこのページ内で集計し、回答内容をサーバーへ送信しません。</p>
+  <div class="actions"><button id="startBtn">診断を始める</button></div>
+</section>
+
+<section class="panel hidden" id="quiz">
+  <div class="muted" id="counter">質問 1 / 50</div>
+  <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+  <div class="question" id="questionText"></div>
+  <div class="answers" id="answers"></div>
+  <div class="actions">
+    <button class="button-secondary" id="prevBtn">前の質問</button>
+    <button id="nextBtn" disabled>次の質問</button>
+  </div>
+</section>
+
+<section class="panel hidden" id="result" aria-live="polite">
+  <div class="eyebrow">YOUR RESULT</div>
+  <div class="result-code" id="resultCode"></div>
+  <div class="type-name" id="typeName"></div>
+  <p class="tagline" id="tagline"></p>
+  <p class="muted" id="summary"></p>
+  <div class="actions">
+    <button id="copyBtn">結果をコピー</button>
+    <button class="button-secondary" id="shareBtn">共有する</button>
+    <button class="button-secondary" id="restartBtn">もう一度診断</button>
+  </div>
+  <div class="panel" style="padding:15px;margin-top:18px">
+    <h2>5つの軸の結果</h2>
+    <div id="axisResults"></div>
+  </div>
+  <p class="warning">結果は今回の回答に基づく傾向の目安です。タイプ名は覚えやすくするための表現であり、固定的な人格ラベルではありません。Gの結果は性自認や性的指向を意味しません。</p>
+</section>
+<footer>オリジナル診断｜試作版</footer>
+</main>
+<script>
+const questions = [
+  // A: 5 T, 5 C
+  ["自分の性別について、もっと深く考えてみたいと思うことがある。","A","T"],
+  ["自分の身体的な性別に関連する特徴に、違和感を覚えることがある。","A","T"],
+  ["自分が別の性別として生活する姿を想像することがある。","A","T"],
+  ["自分の性別について、特に疑問を感じずに過ごしている。","A","C"],
+  ["自分の性別に関する周囲からの扱われ方に、違和感を覚えることがある。","A","T"],
+  ["自分の性別について、これまで深く考える必要をあまり感じなかった。","A","C"],
+  ["今の自分の性別のあり方に、概ね納得している。","A","C"],
+  ["自分の性別に関して、今のあり方を変えたいと思うことはほとんどない。","A","C"],
+  ["自分の性別について、言葉で説明しにくい疑問や引っかかりを感じることがある。","A","T"],
+  ["自分の性別について、現在の認識に大きな疑問を感じていない。","A","C"],
+  // N: 5 F, 5 B
+  ["女性的なメイクや美容技術を積極的に取り入れてみたい。","N","F"],
+  ["女性的な服装やファッションを研究することには、あまり関心がない。","N","B"],
+  ["自分の外見をより女性的に見せる方法を考えることがある。","N","F"],
+  ["女性的な美しさを追求することに、あまり関心がない。","N","B"],
+  ["肌・眉・目元などの細部まで工夫して、理想の外見に近づけたい。","N","F"],
+  ["外見を女性的に整えることより、ほかのことに時間を使いたい。","N","B"],
+  ["女性的に見えるための服装や化粧品について、情報を調べることはほとんどない。","N","B"],
+  ["自分の外見について、細かく工夫する必要性をあまり感じない。","N","B"],
+  ["自分なりの理想の女性美やスタイルを持っている。","N","F"],
+  ["女性的な外見を目指すために、継続して工夫したいと思う。","N","F"],
+  // J: 5 O, 5 P
+  ["自分の表現を他人に見てもらい、反応を得たいと思う。","J","O"],
+  ["他人がどう評価するかに関係なく、自分が満足できればよいと思う。","J","P"],
+  ["自分の写真や作品などを公開して、反応を確かめたいと思う。","J","O"],
+  ["他人から褒められなくても、自分の好きな表現を続けられる。","J","P"],
+  ["自分の表現に対して、共感や称賛を得られるとうれしい。","J","O"],
+  ["他人の反応が少なくても、自分の満足感はあまり変わらない。","J","P"],
+  ["自分の魅力や個性を、他人に知ってもらいたいと思う。","J","O"],
+  ["自分の楽しみは、他人に見せずに完結させても十分だと思う。","J","P"],
+  ["他人からの反応によって、自分の表現への意欲が変わることがある。","J","O"],
+  ["他人に知られなくても、自分が楽しめることには十分価値があると思う。","J","P"],
+  // G: 5 E, 5 I
+  ["自分が女性的な姿になった場面を想像すると、性的に興奮することがある。","G","E"],
+  ["自分を女性として想像することは、性的興奮とはあまり関係がない。","G","I"],
+  ["女性的な服装をした自分を想像することが、性的な気分につながることがある。","G","E"],
+  ["自分が女性として見られる場面を想像しても、性的興奮を感じることはほとんどない。","G","I"],
+  ["自分の女性的な姿を想像することが、性的な空想の一部になることがある。","G","E"],
+  ["自分の外見を女性的に変える想像と、性的な気分は別のものだと感じる。","G","I"],
+  ["自分が女性として振る舞う場面を想像すると、性的な高まりを感じることがある。","G","E"],
+  ["自分を女性として想像すること自体には、性的な意味をほとんど感じない。","G","I"],
+  ["自分の女性的な姿に関する想像が、性的興奮のきっかけになることがある。","G","E"],
+  ["自分を女性として想像することと、性的興奮との間には、あまり結びつきがないと感じる。","G","I"],
+  // H: 5 A, 5 R
+  ["自分の男性的な身体的特徴を、自然なものとして受け入れられる。","H","A"],
+  ["自分の男性的な身体的特徴を、できれば目立たなくしたいと思う。","H","R"],
+  ["男性的とされる声や振る舞いに、特に抵抗を感じない。","H","A"],
+  ["自分に男性的な特徴が表れると、違和感を覚えることがある。","H","R"],
+  ["男性的な外見や振る舞いを、自分の個性の一部として受け入れられる。","H","A"],
+  ["自分が男性的に見られることを、できるだけ避けたいと思う。","H","R"],
+  ["男性的な特徴を持つ自分に対して、特別な不満を感じることは少ない。","H","A"],
+  ["自分の体毛・体格・声などの男性的な特徴を変えたいと思うことがある。","H","R"],
+  ["男性的な特徴を持っていること自体は、特に問題ではないと感じる。","H","A"],
+  ["自分の男性性を意識させられる場面では、居心地の悪さを感じることがある。","H","R"]
+];
+const axes = {
+ A:{name:"性別に関する違和感・探索", labels:{C:"安定・低探索型",T:"違和感・探索型"}},
+ N:{name:"女性美・外見追求", labels:{B:"外見追求控えめ型",F:"女性美追求型"}},
+ J:{name:"自己表現・承認志向", labels:{P:"自己完結型",O:"承認志向型"}},
+ G:{name:"自己女性化イメージと性的興奮", labels:{I:"結びつき弱め型",E:"結びつき強め型"}},
+ H:{name:"男性性への態度", labels:{A:"男性性受容型",R:"男性性違和・回避型"}}
+};
+const types = {
+ "CBPIA":["自然体マイペース","自分の満足を大切にする、飾らない自然体派。"],
+ "CBPIR":["静かな自分探し","外見より内面を見つめ、自分らしさを探るタイプ。"],
+ "CBPEA":["内なる情熱家","自分だけの空想や感覚の世界を楽しむタイプ。"],
+ "CBPER":["内省派の探求者","自分の内面と向き合い、納得できるあり方を模索するタイプ。"],
+ "CFPIA":["美意識マイスタイル","自分らしさを保ちながら、美しさを追求するタイプ。"],
+ "CFPIR":["美と違和感の探求者","理想の美しさを追いながら、自分の男性性との距離感を考えるタイプ。"],
+ "CFPEA":["ひそかな美の探求者","自分のために美しさを磨くことに喜びを見いだすタイプ。"],
+ "CFPER":["美意識の改革者","理想の外見を追い求め、自分のあり方も見つめ直すタイプ。"],
+ "CBOIA":["愛されナチュラル","飾りすぎず、周囲とのつながりや好意を大切にするタイプ。"],
+ "CBOIR":["共感を求める探求者","自分の違和感や思いを、誰かに理解してほしいタイプ。"],
+ "CBOEA":["リアクション・ハンター","人からの反応を楽しみ、自分の感覚も大切にするタイプ。"],
+ "CBOER":["理解されたい内省家","自分の内面を探りながら、他者に理解されることを望むタイプ。"],
+ "CFOIA":["魅せる美意識派","美しさを磨き、その魅力を周囲にも楽しんでもらいたいタイプ。"],
+ "CFOIR":["共感型ビューティー探求者","美しさを追求しながら、自分のあり方への理解も求めるタイプ。"],
+ "CFOEA":["スポットライト・ビューティー","美しさを表現し、周囲の反応をエネルギーに変えるタイプ。"],
+ "CFOER":["共感を紡ぐ表現者","外見を通じて自分を表現し、他者との理解を深めたいタイプ。"],
+ "TBPIA":["静かなる自分探し","外見を大きく変えるより、自分の性別や内面について考えるタイプ。"],
+ "TBPIR":["境界線の探求者","性別や男性性への違和感を、自分なりに理解しようとするタイプ。"],
+ "TBPEA":["内緒のファンタジスタ","人に見せることより、自分の内側にある空想や感覚を楽しむタイプ。"],
+ "TBPER":["境界を歩く思索家","既存の枠にとらわれず、自分にとって自然なあり方を考えるタイプ。"],
+ "TFPIA":["理想の自分クリエイター","自分の理想を形にするため、女性的な美しさを追求するタイプ。"],
+ "TFPIR":["変身する探求者","外見を変えることを通じて、自分の性別やあり方を探るタイプ。"],
+ "TFPEA":["秘密の変身アーティスト","自分のために理想の姿を作り上げることを楽しむタイプ。"],
+ "TFPER":["新しい自分の創造者","理想の外見と自分らしいあり方の両方を追求するタイプ。"],
+ "TBOIA":["わかってほしい探求者","自分の性別や内面について、周囲に理解してもらいたいタイプ。"],
+ "TBOIR":["共感を探す旅人","自分の違和感と向き合いながら、共感できる相手を探すタイプ。"],
+ "TBOEA":["空想のメッセンジャー","内面の空想や感覚を、他者に伝えて反応を得たいタイプ。"],
+ "TBOER":["理解を求める内省家","自分のあり方を考え続け、理解し合える関係を求めるタイプ。"],
+ "TFOIA":["魅せる自己探求者","理想の女性美を表現しながら、自分らしさへの理解も求めるタイプ。"],
+ "TFOIR":["共感型トランスフォーマー","外見と内面の変化を探りながら、理解し合える相手を求めるタイプ。"],
+ "TFOEA":["変身のスター","理想の姿を華やかに表現し、周囲の反応を楽しむタイプ。"],
+ "TFOER":["共感型セルフプロデューサー","自分の理想を表現しながら、他者とのつながりを通じて自分らしさを探るタイプ。"]
+};
+const intro = document.getElementById("intro"), quiz = document.getElementById("quiz"), result = document.getElementById("result");
+const questionText = document.getElementById("questionText"), answersEl = document.getElementById("answers");
+const counter = document.getElementById("counter"), progress = document.getElementById("progress");
+const prevBtn = document.getElementById("prevBtn"), nextBtn = document.getElementById("nextBtn");
+let current = 0, responses = Array(questions.length).fill(null), lastResult = null;
+const scale = ["まったく当てはまらない","あまり当てはまらない","どちらともいえない","やや当てはまる","非常によく当てはまる"];
+function renderQuestion(){
+ const [q] = questions[current]; questionText.textContent=q;
+ counter.textContent=`質問 ${current+1} / ${questions.length}`;
+ progress.style.width=`${(current+1)/questions.length*100}%`;
+ answersEl.innerHTML="";
+ scale.forEach((label,i)=>{
+  const lab=document.createElement("label");lab.className="answer";
+  const input=document.createElement("input");input.type="radio";input.name="answer";input.value=String(i+1);input.checked=responses[current]===i+1;
+  input.addEventListener("change",()=>{responses[current]=i+1;nextBtn.disabled=false;});
+  const span=document.createElement("span");span.textContent=`${i+1}. ${label}`;
+  lab.append(input,span);answersEl.append(lab);
+ });
+ prevBtn.disabled=current===0;
+ nextBtn.textContent=current===questions.length-1?"結果を見る":"次の質問";
+ nextBtn.disabled=responses[current]===null;
+}
+function calculate(){
+ const sums={};Object.keys(axes).forEach(k=>{sums[k]={};Object.keys(axes[k].labels).forEach(t=>sums[k][t]=[]);});
+ questions.forEach((q,i)=>sums[q[1]][q[2]].push(responses[i]));
+ const chosen={}, details={};
+ Object.keys(axes).forEach(k=>{
+  const letters=Object.keys(axes[k].labels);
+  const avg={};letters.forEach(l=>avg[l]=sums[k][l].reduce((a,b)=>a+b,0)/sums[k][l].length);
+  const diff=Math.abs(avg[letters[0]]-avg[letters[1]]);
+  chosen[k]=avg[letters[0]]===avg[letters[1]]?letters[0]:letters[0]; // tie resolved consistently below
+  if(avg[letters[0]]!==avg[letters[1]]) chosen[k]=avg[letters[0]]>avg[letters[1]]?letters[0]:letters[1];
+  details[k]={avg,diff,border:diff<0.4};
+ });
+ const code=chosen.A+chosen.N+chosen.J+chosen.G+chosen.H;
+ return {code,chosen,details};
+}
+function showResult(){
+ lastResult=calculate();intro.classList.add("hidden");quiz.classList.add("hidden");result.classList.remove("hidden");
+ document.getElementById("resultCode").textContent=lastResult.code;
+ const [name,desc]=types[lastResult.code];
+ document.getElementById("typeName").textContent=name;
+ document.getElementById("tagline").textContent=desc;
+ document.getElementById("summary").textContent="5つの軸の回答傾向を組み合わせた結果です。";
+ const axisResults=document.getElementById("axisResults");axisResults.innerHTML="";
+ Object.keys(axes).forEach(k=>{
+  const letter=lastResult.chosen[k], d=lastResult.details[k];
+  const div=document.createElement("div");div.className="result-axis";
+  const title=document.createElement("h3");title.textContent=`${k}｜${axes[k].name}`;
+  const pill=document.createElement("span");pill.className="pill";pill.textContent=`${letter}：${axes[k].labels[letter]}`;
+  const note=document.createElement("p");note.className="muted";note.textContent=`判定差：${d.diff.toFixed(1)}点${d.border?"（境界傾向）":""}`;
+  div.append(title,pill,note);axisResults.append(div);
+ });
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function resultText(){
+ if(!lastResult)return "";
+ const [name,desc]=types[lastResult.code];
+ return `5つの軸で知る、自分の傾向診断\nタイプ：${name}\nコード：${lastResult.code}\n${desc}\n\nこの診断は自己理解を目的としたオリジナルの試作版です。科学的に検証された心理検査ではありません。`;
+}
+document.getElementById("startBtn").addEventListener("click",()=>{intro.classList.add("hidden");quiz.classList.remove("hidden");renderQuestion();window.scrollTo({top:0,behavior:"smooth"});});
+prevBtn.addEventListener("click",()=>{if(current>0){current--;renderQuestion();}});
+nextBtn.addEventListener("click",()=>{if(responses[current]===null)return;if(current<questions.length-1){current++;renderQuestion();}else showResult();});
+document.getElementById("restartBtn").addEventListener("click",()=>{current=0;responses=Array(questions.length).fill(null);lastResult=null;result.classList.add("hidden");intro.classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});});
+document.getElementById("copyBtn").addEventListener("click",async()=>{const text=resultText();try{await navigator.clipboard.writeText(text);document.getElementById("copyBtn").textContent="コピーしました";}catch(e){window.prompt("以下の結果をコピーしてください",text);}});
+document.getElementById("shareBtn").addEventListener("click",async()=>{const data={title:"5つの軸で知る、自分の傾向診断",text:resultText(),url:location.href};if(navigator.share){try{await navigator.share(data);}catch(e){}}else{try{await navigator.clipboard.writeText(resultText()+"\n"+location.href);document.getElementById("shareBtn").textContent="共有文をコピーしました";}catch(e){window.prompt("以下の結果をコピーしてください",resultText()+"\n"+location.href);}}});
+</script>
+</body>
+</html>
