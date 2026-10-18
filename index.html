@@ -170,6 +170,40 @@ const types = {
  "TFOEA":["変身のスター","理想の姿を華やかに表現し、周囲の反応を楽しむタイプ。"],
  "TFOER":["共感型セルフプロデューサー","自分の理想を表現しながら、他者とのつながりを通じて自分らしさを探るタイプ。"]
 };
+
+  // キャッチフレーズを更新
+const catchphrases = {
+  CBPI: "自分時間のマイペース派",
+  CBPE: "自分時間のイメージ派",
+  CBOI: "リアクションを楽しむ表現派",
+  CBOE: "反応も気になるイメージ派",
+
+  CFPI: "自分のための美意識派",
+  CFPE: "美を思い描くマイスタイル派",
+  CFOI: "魅せる美意識派",
+  CFOE: "美とイメージの表現派",
+
+  TBPI: "自分と向き合う探求者",
+  TBPE: "イメージをたどる探求者",
+  TBOI: "自分探しと表現の探求者",
+  TBOE: "自己イメージと表現の探求者",
+
+  TFPI: "自分と美の探求者",
+  TFPE: "理想像を描く美の探求者",
+  TFOI: "自分と美を表現する探求者",
+  TFOE: "理想像と美を表現する探求者"
+};
+
+const hSubtitles = {
+  A: "男性役割への期待に、抵抗は少なめ",
+  R: "男性役割への期待に、負担を感じやすい"
+};
+
+Object.keys(types).forEach(code => {
+  types[code][0] =
+    `${catchphrases[code.slice(0, 4)]}｜${hSubtitles[code[4]]}`;
+});
+  
 const intro = document.getElementById("intro"), quiz = document.getElementById("quiz"), result = document.getElementById("result");
 const questionText = document.getElementById("questionText"), answersEl = document.getElementById("answers");
 const counter = document.getElementById("counter"), progress = document.getElementById("progress");
