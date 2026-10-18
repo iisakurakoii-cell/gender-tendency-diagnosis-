@@ -1,3 +1,8 @@
+以下を**丸ごと置き換えて**ください。レーダーグラフを結果画面に組み込みました。質問・判定方法・同点時のX表示・キャッチフレーズは維持しています。
+
+グラフは外側ほど `T・F・O・E・R` 側の回答傾向を示し、同点は50です。ブラウザでの実行・表示確認は未実施です。
+
+```html
 <!doctype html>
 <html lang="ja">
 <head>
@@ -266,6 +271,85 @@ input:focus-visible {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #fff;
+  white-space: pre-line;
+}
+
+.inner-panel {
+  padding: 15px;
+  margin-top: 18px;
+}
+
+#radarChart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 620px;
+  margin: 0 auto;
+  font-family: inherit;
+}
+
+.chart-legend {
+  margin: 4px 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: .85rem;
+  color: var(--muted);
+}
+
+.chart-legend span {
+  display: inline-block;
+  margin-right: 14px;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 22px;
+  border-top: 3px solid var(--accent);
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.legend-dashed {
+  display: inline-block;
+  width: 22px;
+  border-top: 2px dashed #a597c4;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.chart-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .86rem;
+  margin: 10px 0;
+}
+
+.chart-table caption {
+  text-align: left;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.chart-table th,
+.chart-table td {
+  padding: 9px 7px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.chart-table thead th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.chart-table .score {
+  text-align: right;
+  white-space: nowrap;
+  color: var(--accent);
+  font-weight: 700;
 }
 
 footer {
@@ -288,6 +372,10 @@ footer {
     padding: 16px;
   }
 
+  .inner-panel {
+    padding: 12px;
+  }
+
   .axis-list {
     grid-template-columns: 1fr;
   }
@@ -298,6 +386,10 @@ footer {
 
   .type-name {
     font-size: 1.35rem;
+  }
+
+  .chart-table {
+    font-size: .8rem;
   }
 }
 </style>
@@ -313,7 +405,8 @@ footer {
 
   <p>
     50の質問への回答から、あなたの傾向を5つの軸で整理します。
-    結果は5文字のコードと、回答傾向を表す名前で表示されます。
+    結果は5文字のコード、回答傾向を表す名前、
+    レーダーグラフで表示されます。
     同点の軸にはXを表示し、判定を保留します。
   </p>
 
@@ -358,7 +451,8 @@ footer {
   <p class="muted">
     各軸で両側の回答平均を比較します。
     同点の場合はX（同点・判定保留）とし、
-    平均値の差が0.4点未満の場合は「境界傾向」と表示します。
+    同点ではない場合で平均値の差が0.4点未満なら
+    「境界傾向」と表示します。
     0.4点は、この試作版で設定した目安です。
   </p>
 
@@ -412,6 +506,45 @@ footer {
     <small id="hStatus"></small>
   </div>
 
+  <div class="panel inner-panel">
+    <h2>5つの軸のレーダーグラフ</h2>
+
+    <div id="radarChart"></div>
+
+    <div class="chart-legend">
+      <span><i class="legend-line"></i>今回の回答</span>
+      <span><i class="legend-dashed"></i>50：両側の平均が同点</span>
+    </div>
+
+    <table class="chart-table">
+      <caption>
+        外側ほど、以下の側への回答傾向が強い表示です。
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">軸</th>
+          <th scope="col">外側が示す側</th>
+          <th scope="col" class="score">表示値</th>
+        </tr>
+      </thead>
+      <tbody id="chartValues"></tbody>
+    </table>
+
+    <p class="warning">
+      0は反対側への最大の偏り、100は表に示した側への最大の偏り、
+      50は両側の回答平均が同じことを示します。
+      50は心理的な中立性やバランスの良さを意味しません。
+    </p>
+
+    <p class="warning">
+      数値は回答平均の差を表示用に0〜100へ変換したもので、
+      割合・パーセンタイル・検証済みの尺度得点ではありません。
+      軸どうしで心理的な強さを直接比較したり、
+      面積を総合評価として解釈したりすることはできません。
+    </p>
+  </div>
+
+  <h2 style="margin-top:22px">今回の回答の解説</h2>
   <p class="tagline" id="tagline"></p>
   <p class="muted result-note" id="summary"></p>
 
@@ -434,10 +567,11 @@ footer {
   <p class="warning">
     共有文には、身体的な性別特徴や性的興奮に関する結果も含まれます。
     共有前に内容と共有先を確認してください。
+    コピー・共有は文章のみで、グラフ画像は含みません。
   </p>
 
-  <div class="panel" style="padding:15px;margin-top:18px">
-    <h2>5つの軸の結果</h2>
+  <div class="panel inner-panel">
+    <h2>5つの軸の詳細</h2>
     <div id="axisResults"></div>
   </div>
 
@@ -628,6 +762,49 @@ const axisDescriptions = {
   }
 };
 
+const chartAxes = [
+  {
+    key: "A",
+    low: "C",
+    high: "T",
+    label: "A｜身体的特徴",
+    sublabel: "違和感・探索",
+    outward: "T：身体的特徴への違和感・探索"
+  },
+  {
+    key: "N",
+    low: "B",
+    high: "F",
+    label: "N｜女性美",
+    sublabel: "外見追求",
+    outward: "F：女性美・外見の追求"
+  },
+  {
+    key: "J",
+    low: "P",
+    high: "O",
+    label: "J｜他者の反応",
+    sublabel: "承認志向",
+    outward: "O：他者の反応・評価を求める傾向"
+  },
+  {
+    key: "G",
+    low: "I",
+    high: "E",
+    label: "G｜性的興奮",
+    sublabel: "自己イメージとの結びつき",
+    outward: "E：女性的な自己イメージと性的興奮の結びつき"
+  },
+  {
+    key: "H",
+    low: "A",
+    high: "R",
+    label: "H｜男性役割",
+    sublabel: "抵抗・負担感",
+    outward: "R：男性役割への期待に対する抵抗・負担"
+  }
+];
+
 const scale = [
   "まったく当てはまらない",
   "あまり当てはまらない",
@@ -723,8 +900,8 @@ function calculate() {
   });
 
   questions.forEach((question, index) => {
-    const key = question[1];
-    const letter = question[2];
+    const key = question [dl.acm](https://dl.acm.org/doi/10.5555/AAI28027077);
+    const letter = question [link.springer](https://link.springer.com/content/pdf/10.1007/978-0-585-27572-7_12);
 
     totals[key][letter] += responses[index];
     counts[key][letter] += 1;
@@ -736,7 +913,6 @@ function calculate() {
   axisOrder.forEach(key => {
     const [left, right] = axes[key].letters;
 
-    // 現在の設問構成は各軸とも両側5問ずつ。
     if (counts[key][left] !== 5 || counts[key][right] !== 5) {
       throw new Error(
         `${key}軸の設問数が、両側5問ずつになっていません。`
@@ -755,17 +931,14 @@ function calculate() {
     const diff = totalDiff / 5;
     const tie = totalDiff === 0;
 
-    if (tie) {
-      chosen[key] = "X";
-    } else {
-      chosen[key] = signedTotalDiff > 0 ? left : right;
-    }
+    chosen[key] = tie
+      ? "X"
+      : signedTotalDiff > 0 ? left : right;
 
     details[key] = {
       avg,
       diff,
       tie,
-      // 平均差0.4点未満と同じ条件。
       border: !tie && totalDiff < 2
     };
   });
@@ -790,8 +963,7 @@ function getTypeName(data) {
     return "同点を含む回答プロフィール";
   }
 
-  const prefix = data.code.slice(0, 4);
-  return catchphrases[prefix];
+  return catchphrases[data.code.slice(0, 4)];
 }
 
 function getDescription(data) {
@@ -849,6 +1021,221 @@ function getHStatus(data) {
   return "今回の回答における、両側の回答平均の比較です。";
 }
 
+function getChartValues(data) {
+  return chartAxes.map(axis => {
+    const avg = data.details[axis.key].avg;
+    return 50 + (avg[axis.high] - avg[axis.low]) * 12.5;
+  });
+}
+
+function drawRadarChart(data) {
+  const container = document.getElementById("radarChart");
+  const tableBody = document.getElementById("chartValues");
+
+  container.innerHTML = "";
+  tableBody.innerHTML = "";
+
+  const values = getChartValues(data);
+  const ns = "http://www.w3.org/2000/svg";
+
+  function makeSvgElement(name, attributes, text) {
+    const node = document.createElementNS(ns, name);
+
+    Object.entries(attributes || {}).forEach(([key, value]) => {
+      node.setAttribute(key, String(value));
+    });
+
+    if (text !== undefined) {
+      node.textContent = text;
+    }
+
+    return node;
+  }
+
+  const svg = makeSvgElement("svg", {
+    viewBox: "0 0 640 540",
+    role: "img",
+    "aria-labelledby": "radarTitle radarDescription"
+  });
+
+  svg.append(
+    makeSvgElement(
+      "title",
+      { id: "radarTitle" },
+      "A・N・J・G・Hの回答傾向"
+    ),
+    makeSvgElement(
+      "desc",
+      { id: "radarDescription" },
+      chartAxes.map((axis, index) =>
+        `${axis.key}：${values[index].toFixed(1)}`
+      ).join("、") +
+      "。0〜100の表示値です。50は両側の回答平均が同点です。" +
+      "外側ほどT・F・O・E・R側への回答傾向を示します。"
+    )
+  );
+
+  const centerX = 320;
+  const centerY = 265;
+  const radius = 155;
+  const labelRadius = 217;
+
+  function point(index, distance) {
+    const angle = -Math.PI / 2 + index * 2 * Math.PI / 5;
+
+    return {
+      x: centerX + Math.cos(angle) * distance,
+      y: centerY + Math.sin(angle) * distance
+    };
+  }
+
+  function ringPoints(distance) {
+    return chartAxes.map((_, index) => {
+      const p = point(index, distance);
+      return `${p.x},${p.y}`;
+    }).join(" ");
+  }
+
+  [25, 50, 75, 100].forEach(level => {
+    const ringRadius = radius * level / 100;
+
+    svg.append(
+      makeSvgElement("polygon", {
+        points: ringPoints(ringRadius),
+        fill: "none",
+        stroke: level === 50 ? "#a597c4" : "#e5dfd5",
+        "stroke-width": level === 50 ? 1.8 : 1,
+        "stroke-dasharray": level === 50 ? "5 4" : "none"
+      })
+    );
+  });
+
+  chartAxes.forEach((_, index) => {
+    const outer = point(index, radius);
+
+    svg.append(
+      makeSvgElement("line", {
+        x1: centerX,
+        y1: centerY,
+        x2: outer.x,
+        y2: outer.y,
+        stroke: "#e5dfd5",
+        "stroke-width": 1
+      })
+    );
+  });
+
+  const resultPoints = values.map((value, index) => {
+    const p = point(index, radius * value / 100);
+    return `${p.x},${p.y}`;
+  }).join(" ");
+
+  svg.append(
+    makeSvgElement("polygon", {
+      points: resultPoints,
+      fill: "#6654a3",
+      "fill-opacity": .18,
+      stroke: "#6654a3",
+      "stroke-width": 3,
+      "stroke-linejoin": "round"
+    })
+  );
+
+  // 目盛りは結果の塗りより手前に表示。
+  [0, 25, 50, 75, 100].forEach(level => {
+    svg.append(
+      makeSvgElement("text", {
+        x: centerX + 8,
+        y: centerY - radius * level / 100 + 4,
+        fill: "#716f68",
+        "font-size": 12,
+        stroke: "#fffdf9",
+        "stroke-width": 3,
+        "paint-order": "stroke"
+      }, String(level))
+    );
+  });
+
+  values.forEach((value, index) => {
+    const p = point(index, radius * value / 100);
+
+    const dot = makeSvgElement("circle", {
+      cx: p.x,
+      cy: p.y,
+      r: 5,
+      fill: "#6654a3",
+      stroke: "#fffdf9",
+      "stroke-width": 2
+    });
+
+    dot.append(
+      makeSvgElement(
+        "title",
+        {},
+        `${chartAxes[index].key}：${value.toFixed(1)}`
+      )
+    );
+
+    svg.append(dot);
+  });
+
+  chartAxes.forEach((axis, index) => {
+    const p = point(index, labelRadius);
+
+    const text = makeSvgElement("text", {
+      x: p.x,
+      y: p.y - 8,
+      "text-anchor": "middle",
+      fill: "#282722",
+      "font-size": 16,
+      "font-weight": 700
+    });
+
+    text.append(
+      makeSvgElement("tspan", {
+        x: p.x,
+        dy: 0
+      }, axis.label),
+
+      makeSvgElement("tspan", {
+        x: p.x,
+        dy: 21,
+        "font-size": 12,
+        "font-weight": 400,
+        fill: "#716f68"
+      }, axis.sublabel),
+
+      makeSvgElement("tspan", {
+        x: p.x,
+        dy: 23,
+        "font-size": 18,
+        "font-weight": 700,
+        fill: "#6654a3"
+      }, values[index].toFixed(1))
+    );
+
+    svg.append(text);
+
+    const row = document.createElement("tr");
+
+    const axisCell = document.createElement("th");
+    axisCell.scope = "row";
+    axisCell.textContent = axis.key;
+
+    const labelCell = document.createElement("td");
+    labelCell.textContent = axis.outward;
+
+    const valueCell = document.createElement("td");
+    valueCell.className = "score";
+    valueCell.textContent = values[index].toFixed(1);
+
+    row.append(axisCell, labelCell, valueCell);
+    tableBody.append(row);
+  });
+
+  container.append(svg);
+}
+
 function showResult() {
   lastResult = calculate();
 
@@ -868,12 +1255,13 @@ function showResult() {
   document.getElementById("hStatus").textContent =
     getHStatus(lastResult);
 
+  drawRadarChart(lastResult);
+
   document.getElementById("tagline").textContent =
     getDescription(lastResult);
 
-  const summary = document.getElementById("summary");
-  summary.textContent = getSummary(lastResult);
-  summary.style.whiteSpace = "pre-line";
+  document.getElementById("summary").textContent =
+    getSummary(lastResult);
 
   const axisResults = document.getElementById("axisResults");
   axisResults.innerHTML = "";
@@ -934,6 +1322,12 @@ function resultText() {
     return "";
   }
 
+  const values = getChartValues(lastResult);
+
+  const chartText = chartAxes.map((axis, index) =>
+    `${axis.key}：${values[index].toFixed(1)}（外側：${axis.outward}）`
+  ).join("\n");
+
   return [
     "5つの軸で知る、自分の傾向診断",
     `タイプ：${getTypeName(lastResult)}`,
@@ -941,6 +1335,11 @@ function resultText() {
     "",
     `H｜${hSubtitles[lastResult.chosen.H]}`,
     getHStatus(lastResult),
+    "",
+    "【レーダーグラフの表示値】",
+    chartText,
+    "表示値は0〜100。50は両側の回答平均が同点です。",
+    "数値は割合やパーセンタイルではありません。",
     "",
     getDescription(lastResult),
     "",
@@ -959,6 +1358,9 @@ function resetQuiz() {
 
   copyBtn.textContent = "結果をコピー";
   shareBtn.textContent = "共有する";
+
+  document.getElementById("radarChart").innerHTML = "";
+  document.getElementById("chartValues").innerHTML = "";
 
   result.classList.add("hidden");
   quiz.classList.add("hidden");
@@ -1030,7 +1432,6 @@ shareBtn.addEventListener("click", async () => {
     text: resultText()
   };
 
-  // ローカルファイルのパスは共有文に含めない。
   if (
     location.protocol === "https:" ||
     location.protocol === "http:"
@@ -1063,3 +1464,4 @@ shareBtn.addEventListener("click", async () => {
 </script>
 </body>
 </html>
+```
