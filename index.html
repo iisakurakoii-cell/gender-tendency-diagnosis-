@@ -5,73 +5,458 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f7f4ef">
 <title>5つの軸で知る、自分の傾向診断</title>
+
 <style>
-:root{--bg:#f7f4ef;--paper:#fffdf9;--ink:#282722;--muted:#716f68;--line:#e5dfd5;--accent:#6654a3;--accent-soft:#eee9f8;--good:#e8f1e8}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.65}
-main{width:min(760px,100%);margin:auto;padding:24px 16px 56px}.hero{padding:28px 22px;background:var(--paper);border:1px solid var(--line);border-radius:22px}
-.eyebrow{font-size:.78rem;letter-spacing:.12em;color:var(--accent);font-weight:700}.hero h1{font-size:clamp(1.7rem,6vw,2.5rem);line-height:1.3;margin:.5rem 0 1rem}.hero p{margin:.5rem 0;color:#55534d}
-.panel{margin-top:16px;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px}
-h2{font-size:1.2rem;margin:0 0 10px}h3{font-size:1rem;margin:0 0 8px}.muted{color:var(--muted);font-size:.9rem}.axis-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.axis{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.axis b{display:block}.axis small{color:var(--muted)}
-button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 16px;background:var(--accent);color:white;font-weight:650}.button-secondary{background:white;color:var(--ink);border:1px solid var(--line)}button:disabled{opacity:.4;cursor:not-allowed}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.progress-wrap{height:7px;background:#e9e4dc;border-radius:9px;overflow:hidden;margin:10px 0 18px}.progress{height:100%;width:0;background:var(--accent);transition:width .15s}
-.question{font-size:1.12rem;font-weight:650;margin:8px 0 18px}.answers{display:grid;gap:9px}.answer{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:white;cursor:pointer}.answer:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}.answer input{accent-color:var(--accent);width:18px;height:18px;flex-shrink:0}
-.result-code{font-size:clamp(2rem,8vw,3.4rem);letter-spacing:.12em;font-weight:800;color:var(--accent);line-height:1.2;overflow-wrap:anywhere}.type-name{font-size:1.55rem;font-weight:750;margin:8px 0}.tagline{font-size:1.05rem}.result-axis{padding:12px 0;border-bottom:1px solid var(--line)}.result-axis:last-child{border-bottom:0}.pill{display:inline-block;background:var(--accent-soft);color:#514080;padding:3px 9px;border-radius:99px;font-size:.8rem;font-weight:700}.hidden{display:none!important}.warning{font-size:.84rem;color:var(--muted)}footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.8rem}
-@media(max-width:520px){main{padding:12px 11px 36px}.hero{padding:23px 17px}.panel{padding:16px}.axis-list{grid-template-columns:1fr}.actions button{flex:1 1 140px}}
+:root {
+  --bg: #f7f4ef;
+  --paper: #fffdf9;
+  --ink: #282722;
+  --muted: #716f68;
+  --line: #e5dfd5;
+  --accent: #6654a3;
+  --accent-soft: #eee9f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family:
+    -apple-system, BlinkMacSystemFont,
+    "Hiragino Kaku Gothic ProN", "Yu Gothic",
+    Meiryo, sans-serif;
+  line-height: 1.65;
+}
+
+main {
+  width: min(760px, 100%);
+  margin: auto;
+  padding: 24px 16px 56px;
+}
+
+.hero {
+  padding: 28px 22px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+}
+
+.eyebrow {
+  font-size: .78rem;
+  letter-spacing: .12em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.hero h1 {
+  font-size: clamp(1.7rem, 6vw, 2.5rem);
+  line-height: 1.3;
+  margin: .5rem 0 1rem;
+}
+
+.hero p {
+  margin: .5rem 0;
+  color: #55534d;
+}
+
+.panel {
+  margin-top: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin: 0 0 10px;
+}
+
+h3 {
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.axis-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.axis {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.axis b {
+  display: block;
+}
+
+.axis small {
+  color: var(--muted);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: var(--accent);
+  color: white;
+  font-weight: 650;
+}
+
+.button-secondary {
+  background: white;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.progress-wrap {
+  height: 7px;
+  background: #e9e4dc;
+  border-radius: 9px;
+  overflow: hidden;
+  margin: 10px 0 18px;
+}
+
+.progress {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width .15s;
+}
+
+.question {
+  font-size: 1.12rem;
+  font-weight: 650;
+  margin: 8px 0 18px;
+}
+
+.answers {
+  display: grid;
+  gap: 9px;
+}
+
+.answer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+}
+
+.answer:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.answer input {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.result-code {
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  letter-spacing: .12em;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.type-name {
+  font-size: 1.55rem;
+  font-weight: 750;
+  margin: 10px 0;
+  line-height: 1.45;
+}
+
+.h-note {
+  margin: 12px 0 16px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--accent-soft);
+  color: #514080;
+  font-size: .95rem;
+}
+
+.h-note small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.tagline {
+  font-size: 1rem;
+  line-height: 1.9;
+  white-space: pre-line;
+}
+
+.result-axis {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.result-axis:last-child {
+  border-bottom: 0;
+}
+
+.result-axis p {
+  margin: 8px 0 0;
+}
+
+.pill {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: #514080;
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.warning {
+  font-size: .84rem;
+  color: var(--muted);
+}
+
+.result-note {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+footer {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+@media (max-width: 520px) {
+  main {
+    padding: 12px 11px 36px;
+  }
+
+  .hero {
+    padding: 23px 17px;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .axis-list {
+    grid-template-columns: 1fr;
+  }
+
+  .actions button {
+    flex: 1 1 140px;
+  }
+
+  .type-name {
+    font-size: 1.35rem;
+  }
+}
 </style>
 </head>
+
 <body>
 <main>
+
 <section class="hero">
   <div class="eyebrow">ORIGINAL SELF-REFLECTION TEST</div>
+
   <h1>5つの軸で知る、<br>自分の傾向診断</h1>
-  <p>50の質問への回答から、あなたの傾向を5つの軸で整理します。結果は5文字のコードとタイプ名で表示されます。</p>
-  <p class="warning">この診断は自己理解を目的としたオリジナルの試作版であり、科学的に検証された心理検査・医学的診断ではありません。結果から性自認、性的指向、人格などを断定することはできません。</p>
+
+  <p>
+    50の質問への回答から、あなたの傾向を5つの軸で整理します。
+    結果は5文字のコードと、回答傾向を表す名前で表示されます。
+    同点の軸にはXを表示し、判定を保留します。
+  </p>
+
+  <p class="warning">
+    この診断は自己理解を目的としたオリジナルの試作版であり、
+    科学的に検証された心理検査・医学的診断ではありません。
+    結果から性自認、性的指向、人格などを断定することはできません。
+    性的な内容を含む質問があります。
+  </p>
 </section>
 
 <section class="panel" id="intro">
   <h2>診断する5つの軸</h2>
+
   <div class="axis-list">
-    <div class="axis"><b>A｜身体的な性別特徴への違和感・探索</b><small>C：安定・低探索 ／ T：違和感・探索</small></div>
-    <div class="axis"><b>N｜女性美・外見追求</b><small>B：控えめ ／ F：積極的に追求</small></div>
-    <div class="axis"><b>J｜自己表現・承認志向</b><small>P：自己完結 ／ O：承認志向</small></div>
-    <div class="axis"><b>G｜自己女性化イメージと性的興奮</b><small>I：結びつき弱め ／ E：結びつき強め</small></div>
-    <div class="axis"><b>H｜社会的な男性らしさへの態度</b><small>A：受容 ／ R：違和感・回避</small></div>
+    <div class="axis">
+      <b>A｜身体的な性別特徴への違和感・探索</b>
+      <small>C：安定・低探索 ／ T：違和感・探索</small>
+    </div>
+
+    <div class="axis">
+      <b>N｜女性美・外見追求</b>
+      <small>B：控えめ ／ F：積極的に追求</small>
+    </div>
+
+    <div class="axis">
+      <b>J｜自己表現・承認志向</b>
+      <small>P：自己完結 ／ O：承認志向</small>
+    </div>
+
+    <div class="axis">
+      <b>G｜自己女性化イメージと性的興奮</b>
+      <small>I：結びつき弱め ／ E：結びつき強め</small>
+    </div>
+
+    <div class="axis">
+      <b>H｜男性役割への期待に対する抵抗・負担感</b>
+      <small>A：抵抗・負担が少なめ ／ R：抵抗・負担が強め</small>
+    </div>
   </div>
-  <p class="muted">目安時間：約5〜8分。回答はこのページ内で集計し、回答内容をサーバーへ送信しません。</p>
-  <div class="actions"><button id="startBtn">診断を始める</button></div>
+
+  <p class="muted">
+    各軸で両側の回答平均を比較します。
+    同点の場合はX（同点・判定保留）とし、
+    平均値の差が0.4点未満の場合は「境界傾向」と表示します。
+    0.4点は、この試作版で設定した目安です。
+  </p>
+
+  <p class="muted">
+    目安時間：約5〜8分。
+    回答はこのページ内で集計し、回答内容を自動的にサーバーへ送信しません。
+    コピー・共有は、ご自身で操作した場合に行われます。
+    再読み込みすると回答は消えます。
+  </p>
+
+  <div class="actions">
+    <button id="startBtn" type="button">診断を始める</button>
+  </div>
 </section>
 
 <section class="panel hidden" id="quiz">
   <div class="muted" id="counter">質問 1 / 50</div>
-  <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+
+  <div class="progress-wrap">
+    <div class="progress" id="progress"></div>
+  </div>
+
   <div class="question" id="questionText"></div>
-  <div class="answers" id="answers"></div>
+
+  <div
+    class="answers"
+    id="answers"
+    role="radiogroup"
+    aria-labelledby="questionText"
+  ></div>
+
   <div class="actions">
-    <button class="button-secondary" id="prevBtn">前の質問</button>
-    <button id="nextBtn" disabled>次の質問</button>
+    <button
+      class="button-secondary"
+      id="prevBtn"
+      type="button"
+    >前の質問</button>
+
+    <button id="nextBtn" type="button" disabled>次の質問</button>
   </div>
 </section>
 
 <section class="panel hidden" id="result" aria-live="polite">
   <div class="eyebrow">YOUR RESULT</div>
+
   <div class="result-code" id="resultCode"></div>
   <div class="type-name" id="typeName"></div>
-  <p class="tagline" id="tagline"></p>
-  <p class="muted" id="summary"></p>
-  <div class="actions">
-    <button id="copyBtn">結果をコピー</button>
-    <button class="button-secondary" id="shareBtn">共有する</button>
-    <button class="button-secondary" id="restartBtn">もう一度診断</button>
+
+  <div class="h-note">
+    <div id="hSubtitle"></div>
+    <small id="hStatus"></small>
   </div>
+
+  <p class="tagline" id="tagline"></p>
+  <p class="muted result-note" id="summary"></p>
+
+  <div class="actions">
+    <button id="copyBtn" type="button">結果をコピー</button>
+
+    <button
+      class="button-secondary"
+      id="shareBtn"
+      type="button"
+    >共有する</button>
+
+    <button
+      class="button-secondary"
+      id="restartBtn"
+      type="button"
+    >もう一度診断</button>
+  </div>
+
+  <p class="warning">
+    共有文には、身体的な性別特徴や性的興奮に関する結果も含まれます。
+    共有前に内容と共有先を確認してください。
+  </p>
+
   <div class="panel" style="padding:15px;margin-top:18px">
     <h2>5つの軸の結果</h2>
     <div id="axisResults"></div>
   </div>
-  <p class="warning">結果は今回の回答に基づく傾向の目安です。タイプ名は覚えやすくするための表現であり、固定的な人格ラベルではありません。Gの結果は性自認や性的指向を意味しません。</p>
+
+  <p class="warning">
+    結果は今回の回答に基づく傾向の目安です。
+    名前は回答傾向を覚えやすくするための表現であり、
+    固定的な人格ラベルではありません。
+    Gの結果は性自認や性的指向を意味しません。
+    Hの結果は、男性役割への賛否、実際の回避行動、
+    自律性や適応能力を判定するものではありません。
+  </p>
 </section>
+
 <footer>オリジナル診断｜試作版</footer>
 </main>
+
 <script>
+"use strict";
+
 const questions = [
   // A: 5 T, 5 C
   ["自分の体の性別特徴について、受けとめ方を深く考えたいと思うことがある。","A","T"],
@@ -84,6 +469,7 @@ const questions = [
   ["体の性別特徴に関して、これといって変えたいとは思わない。","A","C"],
   ["体の性別特徴について、言葉にしにくい引っかかりを感じることがある。","A","T"],
   ["自分の身体の性に関わる特徴には、特に違和感を覚えない。","A","C"],
+
   // N: 5 F, 5 B
   ["女性的な印象をつくるメイクや美容法を、積極的に試してみたい。","N","F"],
   ["女性らしい服装やファッションの研究には、あまり関心がない。","N","B"],
@@ -95,6 +481,7 @@ const questions = [
   ["見た目の細かい部分まで手をかける必要は、あまり感じない。","N","B"],
   ["自分が目指したい女性的な美しさやスタイルを、思い描いている。","N","F"],
   ["女性的な外見に近づけるため、工夫を重ねていきたい。","N","F"],
+
   // J: 5 O, 5 P
   ["自分なりの表現を誰かに見せて、その反応を知りたい。","J","O"],
   ["周囲からどう評価されても、自分が満足できればそれでよいと思う。","J","P"],
@@ -106,6 +493,7 @@ const questions = [
   ["自分の楽しみは、誰にも見せずに完結しても十分だと思う。","J","P"],
   ["周囲からの反応次第で、表現へのやる気が変わることがある。","J","O"],
   ["誰にも知られなくても、自分が楽しめることには十分な価値があると思う。","J","P"],
+
   // G: 5 E, 5 I
   ["女性的な姿になった自分を思い描くと、性的な興奮を感じることがある。","G","E"],
   ["女性としての自分を思い浮かべることは、性的な興奮にはあまりつながらない。","G","I"],
@@ -117,6 +505,7 @@ const questions = [
   ["女性としての自分を想像すること自体に、性的な意味合いはほとんど感じない。","G","I"],
   ["女性的な姿になった自分のイメージから、性的な興奮が生じることがある。","G","E"],
   ["女性としての自己イメージと性的な興奮は、あまり連動しないと感じる。","G","I"],
+
   // H: 5 A, 5 R
   ["周囲から「男らしく」と期待されても、ごく自然に受けとめられる。","H","A"],
   ["男性として振る舞うよう求められると、息苦しさを感じることがある。","H","R"],
@@ -129,49 +518,56 @@ const questions = [
   ["周囲が期待する「男らしい生き方」は、自分にとってあまり窮屈ではない。","H","A"],
   ["男らしくあることを強く求められる場面で、息が詰まる思いをすることがある。","H","R"]
 ];
+
+const axisOrder = ["A", "N", "J", "G", "H"];
+
 const axes = {
- A:{name:"身体的な性別特徴への違和感・探索", labels:{C:"安定・低探索型",T:"違和感・探索型"}},
- N:{name:"女性美・外見追求", labels:{B:"外見追求控えめ型",F:"女性美追求型"}},
- J:{name:"自己表現・承認志向", labels:{P:"自己完結型",O:"承認志向型"}},
- G:{name:"自己女性化イメージと性的興奮", labels:{I:"結びつき弱め型",E:"結びつき強め型"}},
- H:{name:"社会的な男性らしさへの態度", labels:{A:"男性役割受容型",R:"男性役割違和・回避型"}}
-};
-const types = {
- "CBPIA":["自然体マイペース","自分の満足を大切にする、飾らない自然体派。"],
- "CBPIR":["静かな自分探し","外見より内面を見つめ、自分らしさを探るタイプ。"],
- "CBPEA":["内なる情熱家","自分だけの空想や感覚の世界を楽しむタイプ。"],
- "CBPER":["内省派の探求者","自分の内面と向き合い、納得できるあり方を模索するタイプ。"],
- "CFPIA":["美意識マイスタイル","自分らしさを保ちながら、美しさを追求するタイプ。"],
- "CFPIR":["美と違和感の探求者","理想の美しさを追いながら、男らしい生き方への違和感を抱えるタイプ。"],
- "CFPEA":["ひそかな美の探求者","自分のために美しさを磨くことに喜びを見いだすタイプ。"],
- "CFPER":["美意識の改革者","理想の外見を追い求め、自分のあり方も見つめ直すタイプ。"],
- "CBOIA":["愛されナチュラル","飾りすぎず、周囲とのつながりや好意を大切にするタイプ。"],
- "CBOIR":["共感を求める探求者","自分の違和感や思いを、誰かに理解してほしいタイプ。"],
- "CBOEA":["リアクション・ハンター","人からの反応を楽しみ、自分の感覚も大切にするタイプ。"],
- "CBOER":["理解されたい内省家","自分の内面を探りながら、他者に理解されることを望むタイプ。"],
- "CFOIA":["魅せる美意識派","美しさを磨き、その魅力を周囲にも楽しんでもらいたいタイプ。"],
- "CFOIR":["共感型ビューティー探求者","美しさを追求しながら、自分のあり方への理解も求めるタイプ。"],
- "CFOEA":["スポットライト・ビューティー","美しさを表現し、周囲の反応をエネルギーに変えるタイプ。"],
- "CFOER":["共感を紡ぐ表現者","外見を通じて自分を表現し、他者との理解を深めたいタイプ。"],
- "TBPIA":["静かなる自分探し","外見を大きく変えるより、自分の体の性別特徴や内面について考えるタイプ。"],
- "TBPIR":["境界線の探求者","性別や男性性への違和感を、自分なりに理解しようとするタイプ。"],
- "TBPEA":["内緒のファンタジスタ","人に見せることより、自分の内側にある空想や感覚を楽しむタイプ。"],
- "TBPER":["境界を歩く思索家","既存の枠にとらわれず、自分にとって自然なあり方を考えるタイプ。"],
- "TFPIA":["理想の自分クリエイター","自分の理想を形にするため、女性的な美しさを追求するタイプ。"],
- "TFPIR":["変身する探求者","外見を変えることを通じて、自分の身体の性別特徴やあり方を探るタイプ。"],
- "TFPEA":["秘密の変身アーティスト","自分のために理想の姿を作り上げることを楽しむタイプ。"],
- "TFPER":["新しい自分の創造者","理想の外見と自分らしいあり方の両方を追求するタイプ。"],
- "TBOIA":["わかってほしい探求者","自分の身体の性別特徴や内面について、周囲に理解してもらいたいタイプ。"],
- "TBOIR":["共感を探す旅人","自分の違和感と向き合いながら、共感できる相手を探すタイプ。"],
- "TBOEA":["空想のメッセンジャー","内面の空想や感覚を、他者に伝えて反応を得たいタイプ。"],
- "TBOER":["理解を求める内省家","自分のあり方を考え続け、理解し合える関係を求めるタイプ。"],
- "TFOIA":["魅せる自己探求者","理想の女性美を表現しながら、自分らしさへの理解も求めるタイプ。"],
- "TFOIR":["共感型トランスフォーマー","外見と内面の変化を探りながら、理解し合える相手を求めるタイプ。"],
- "TFOEA":["変身のスター","理想の姿を華やかに表現し、周囲の反応を楽しむタイプ。"],
- "TFOER":["共感型セルフプロデューサー","自分の理想を表現しながら、他者とのつながりを通じて自分らしさを探るタイプ。"]
+  A: {
+    name: "身体的な性別特徴への違和感・探索",
+    letters: ["C", "T"],
+    labels: {
+      C: "安定・低探索",
+      T: "違和感・探索"
+    }
+  },
+
+  N: {
+    name: "女性美・外見追求",
+    letters: ["B", "F"],
+    labels: {
+      B: "外見追求控えめ",
+      F: "女性美追求"
+    }
+  },
+
+  J: {
+    name: "自己表現・承認志向",
+    letters: ["P", "O"],
+    labels: {
+      P: "自己完結",
+      O: "承認志向"
+    }
+  },
+
+  G: {
+    name: "自己女性化イメージと性的興奮",
+    letters: ["I", "E"],
+    labels: {
+      I: "結びつき弱め",
+      E: "結びつき強め"
+    }
+  },
+
+  H: {
+    name: "男性役割への期待に対する抵抗・負担感",
+    letters: ["A", "R"],
+    labels: {
+      A: "抵抗・負担が少なめ",
+      R: "抵抗・負担が強め"
+    }
+  }
 };
 
-  // キャッチフレーズを更新
 const catchphrases = {
   CBPI: "自分時間のマイペース派",
   CBPE: "自分時間のイメージ派",
@@ -195,81 +591,475 @@ const catchphrases = {
 };
 
 const hSubtitles = {
-  A: "男性役割への期待に、抵抗は少なめ",
-  R: "男性役割への期待に、負担を感じやすい"
+  A: "男性役割への期待に、抵抗・負担は少なめ",
+  R: "男性役割への期待に、抵抗・負担を感じやすい",
+  X: "男性役割への期待に対する抵抗・負担感は、同点のため判定保留"
 };
 
-Object.keys(types).forEach(code => {
-  types[code][0] =
-    `${catchphrases[code.slice(0, 4)]}｜${hSubtitles[code[4]]}`;
+const axisDescriptions = {
+  A: {
+    C: "身体的な性別特徴については、違和感や探索よりも、受け入れや疑問の少なさを表す側の回答平均が高くなりました。",
+    T: "身体的な性別特徴については、受け入れや疑問の少なさよりも、違和感や探索を表す側の回答平均が高くなりました。",
+    X: "身体的な性別特徴への違和感・探索については、両側の回答平均が同点でした。どちらか一方への判定は保留しています。"
+  },
+
+  N: {
+    B: "女性的な外見の追求については、積極的に取り組みたい側よりも、関心や優先度が控えめな側の回答平均が高くなりました。",
+    F: "女性的な外見の追求については、関心や優先度が控えめな側よりも、積極的に取り組みたい側の回答平均が高くなりました。",
+    X: "女性的な外見の追求については、両側の回答平均が同点でした。どちらか一方への判定は保留しています。"
+  },
+
+  J: {
+    P: "自己表現については、他者の反応を求める側よりも、自分の満足を軸に楽しむ側の回答平均が高くなりました。",
+    O: "自己表現については、自分の満足で完結する側よりも、他者の反応や評価を求める側の回答平均が高くなりました。",
+    X: "自己表現と他者の反応については、両側の回答平均が同点でした。どちらか一方への判定は保留しています。"
+  },
+
+  G: {
+    I: "女性的な自分を思い描くことと性的興奮については、結びつきが強い側よりも、結びつきが弱い側の回答平均が高くなりました。",
+    E: "女性的な自分を思い描くことと性的興奮については、結びつきが弱い側よりも、結びつきが強い側の回答平均が高くなりました。",
+    X: "女性的な自分を思い描くことと性的興奮の結びつきについては、両側の回答平均が同点でした。どちらか一方への判定は保留しています。"
+  },
+
+  H: {
+    A: "男性としての役割や「男らしさ」を期待されることについては、抵抗・負担が強い側よりも、抵抗・負担が少ない側の回答平均が高くなりました。",
+    R: "男性としての役割や「男らしさ」を期待されることについては、抵抗・負担が少ない側よりも、抵抗・負担が強い側の回答平均が高くなりました。",
+    X: "男性としての役割や「男らしさ」を期待されることへの抵抗・負担感は、両側の回答平均が同点でした。どちらか一方への判定は保留しています。"
+  }
+};
+
+const scale = [
+  "まったく当てはまらない",
+  "あまり当てはまらない",
+  "どちらともいえない",
+  "やや当てはまる",
+  "非常によく当てはまる"
+];
+
+const intro = document.getElementById("intro");
+const quiz = document.getElementById("quiz");
+const result = document.getElementById("result");
+
+const questionText = document.getElementById("questionText");
+const answersEl = document.getElementById("answers");
+const counter = document.getElementById("counter");
+const progress = document.getElementById("progress");
+
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const copyBtn = document.getElementById("copyBtn");
+const shareBtn = document.getElementById("shareBtn");
+
+let current = 0;
+let responses = Array(questions.length).fill(null);
+let lastResult = null;
+
+function renderQuestion() {
+  questionText.textContent = questions[current][0];
+
+  counter.textContent =
+    `質問 ${current + 1} / ${questions.length}`;
+
+  progress.style.width =
+    `${((current + 1) / questions.length) * 100}%`;
+
+  answersEl.innerHTML = "";
+
+  scale.forEach((label, i) => {
+    const value = i + 1;
+
+    const lab = document.createElement("label");
+    lab.className = "answer";
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "answer";
+    input.value = String(value);
+    input.checked = responses[current] === value;
+
+    input.addEventListener("change", () => {
+      responses[current] = value;
+      nextBtn.disabled = false;
+    });
+
+    const span = document.createElement("span");
+    span.textContent = `${value}. ${label}`;
+
+    lab.append(input, span);
+    answersEl.append(lab);
+  });
+
+  prevBtn.disabled = current === 0;
+
+  nextBtn.textContent =
+    current === questions.length - 1
+      ? "結果を見る"
+      : "次の質問";
+
+  nextBtn.disabled = responses[current] === null;
+}
+
+function calculate() {
+  if (
+    responses.length !== questions.length ||
+    responses.some(value =>
+      !Number.isInteger(value) || value < 1 || value > 5
+    )
+  ) {
+    throw new Error("すべての質問への回答が必要です。");
+  }
+
+  const totals = {};
+  const counts = {};
+
+  axisOrder.forEach(key => {
+    totals[key] = {};
+    counts[key] = {};
+
+    axes[key].letters.forEach(letter => {
+      totals[key][letter] = 0;
+      counts[key][letter] = 0;
+    });
+  });
+
+  questions.forEach((question, index) => {
+    const key = question[1];
+    const letter = question[2];
+
+    totals[key][letter] += responses[index];
+    counts[key][letter] += 1;
+  });
+
+  const chosen = {};
+  const details = {};
+
+  axisOrder.forEach(key => {
+    const [left, right] = axes[key].letters;
+
+    // 現在の設問構成は各軸とも両側5問ずつ。
+    if (counts[key][left] !== 5 || counts[key][right] !== 5) {
+      throw new Error(
+        `${key}軸の設問数が、両側5問ずつになっていません。`
+      );
+    }
+
+    const avg = {
+      [left]: totals[key][left] / counts[key][left],
+      [right]: totals[key][right] / counts[key][right]
+    };
+
+    const signedTotalDiff =
+      totals[key][left] - totals[key][right];
+
+    const totalDiff = Math.abs(signedTotalDiff);
+    const diff = totalDiff / 5;
+    const tie = totalDiff === 0;
+
+    if (tie) {
+      chosen[key] = "X";
+    } else {
+      chosen[key] = signedTotalDiff > 0 ? left : right;
+    }
+
+    details[key] = {
+      avg,
+      diff,
+      tie,
+      // 平均差0.4点未満と同じ条件。
+      border: !tie && totalDiff < 2
+    };
+  });
+
+  const code = axisOrder
+    .map(key => chosen[key])
+    .join("");
+
+  return {
+    code,
+    chosen,
+    details
+  };
+}
+
+function getTypeName(data) {
+  if (data.code === "XXXXX") {
+    return "全軸同点の回答プロフィール";
+  }
+
+  if (axisOrder.some(key => data.details[key].tie)) {
+    return "同点を含む回答プロフィール";
+  }
+
+  const prefix = data.code.slice(0, 4);
+  return catchphrases[prefix];
+}
+
+function getDescription(data) {
+  return axisOrder
+    .map(key => axisDescriptions[key][data.chosen[key]])
+    .join("\n\n");
+}
+
+function getSummary(data) {
+  const tieAxes = axisOrder.filter(
+    key => data.details[key].tie
+  );
+
+  const borderAxes = axisOrder.filter(
+    key => data.details[key].border
+  );
+
+  const notes = [
+    "結果は、各軸の両側に対応する質問の回答平均を比較したものです。"
+  ];
+
+  if (tieAxes.length > 0) {
+    notes.push(
+      `同点の軸：${tieAxes.join("・")}。` +
+      "Xは同点・判定保留を表し、中立性やバランスの良さを意味するものではありません。"
+    );
+  }
+
+  if (borderAxes.length > 0) {
+    notes.push(
+      `境界傾向の軸：${borderAxes.join("・")}。` +
+      "両側の平均差が小さいため、タイプ名よりも各軸の詳細を重視してください。"
+    );
+  }
+
+  notes.push(
+    "表示された側だけに当てはまるという意味ではなく、" +
+    "両側への回答の強さは平均値でも確認できます。"
+  );
+
+  return notes.join("\n\n");
+}
+
+function getHStatus(data) {
+  const detail = data.details.H;
+
+  if (detail.tie) {
+    return "両側の回答平均が同点のため、A・Rのどちらにも分類していません。";
+  }
+
+  if (detail.border) {
+    return "境界傾向：両側の回答平均の差が小さい結果です。";
+  }
+
+  return "今回の回答における、両側の回答平均の比較です。";
+}
+
+function showResult() {
+  lastResult = calculate();
+
+  intro.classList.add("hidden");
+  quiz.classList.add("hidden");
+  result.classList.remove("hidden");
+
+  document.getElementById("resultCode").textContent =
+    lastResult.code;
+
+  document.getElementById("typeName").textContent =
+    getTypeName(lastResult);
+
+  document.getElementById("hSubtitle").textContent =
+    hSubtitles[lastResult.chosen.H];
+
+  document.getElementById("hStatus").textContent =
+    getHStatus(lastResult);
+
+  document.getElementById("tagline").textContent =
+    getDescription(lastResult);
+
+  const summary = document.getElementById("summary");
+  summary.textContent = getSummary(lastResult);
+  summary.style.whiteSpace = "pre-line";
+
+  const axisResults = document.getElementById("axisResults");
+  axisResults.innerHTML = "";
+
+  axisOrder.forEach(key => {
+    const axis = axes[key];
+    const letter = lastResult.chosen[key];
+    const detail = lastResult.details[key];
+    const [left, right] = axis.letters;
+
+    const div = document.createElement("div");
+    div.className = "result-axis";
+
+    const title = document.createElement("h3");
+    title.textContent = `${key}｜${axis.name}`;
+
+    const pill = document.createElement("span");
+    pill.className = "pill";
+
+    pill.textContent = detail.tie
+      ? "X：同点・判定保留"
+      : `${letter}：${axis.labels[letter]}`;
+
+    const averages = document.createElement("p");
+    averages.className = "muted";
+
+    averages.textContent =
+      `回答平均（1〜5点）：` +
+      `${left}側 ${detail.avg[left].toFixed(1)}点 ／ ` +
+      `${right}側 ${detail.avg[right].toFixed(1)}点`;
+
+    const note = document.createElement("p");
+    note.className = "muted";
+
+    let status = "";
+
+    if (detail.tie) {
+      status = "（同点のため判定保留）";
+    } else if (detail.border) {
+      status = "（境界傾向）";
+    }
+
+    note.textContent =
+      `平均値の差：${detail.diff.toFixed(1)}点${status}`;
+
+    div.append(title, pill, averages, note);
+    axisResults.append(div);
+  });
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+function resultText() {
+  if (!lastResult) {
+    return "";
+  }
+
+  return [
+    "5つの軸で知る、自分の傾向診断",
+    `タイプ：${getTypeName(lastResult)}`,
+    `コード：${lastResult.code}`,
+    "",
+    `H｜${hSubtitles[lastResult.chosen.H]}`,
+    getHStatus(lastResult),
+    "",
+    getDescription(lastResult),
+    "",
+    getSummary(lastResult),
+    "",
+    "この診断は自己理解を目的としたオリジナルの試作版です。",
+    "科学的に検証された心理検査・医学的診断ではありません。",
+    "結果から性自認、性的指向、人格などを断定することはできません。"
+  ].join("\n");
+}
+
+function resetQuiz() {
+  current = 0;
+  responses = Array(questions.length).fill(null);
+  lastResult = null;
+
+  copyBtn.textContent = "結果をコピー";
+  shareBtn.textContent = "共有する";
+
+  result.classList.add("hidden");
+  quiz.classList.add("hidden");
+  intro.classList.remove("hidden");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+document.getElementById("startBtn").addEventListener("click", () => {
+  intro.classList.add("hidden");
+  quiz.classList.remove("hidden");
+
+  renderQuestion();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 });
-  
-const intro = document.getElementById("intro"), quiz = document.getElementById("quiz"), result = document.getElementById("result");
-const questionText = document.getElementById("questionText"), answersEl = document.getElementById("answers");
-const counter = document.getElementById("counter"), progress = document.getElementById("progress");
-const prevBtn = document.getElementById("prevBtn"), nextBtn = document.getElementById("nextBtn");
-let current = 0, responses = Array(questions.length).fill(null), lastResult = null;
-const scale = ["まったく当てはまらない","あまり当てはまらない","どちらともいえない","やや当てはまる","非常によく当てはまる"];
-function renderQuestion(){
- const [q] = questions[current]; questionText.textContent=q;
- counter.textContent=`質問 ${current+1} / ${questions.length}`;
- progress.style.width=`${(current+1)/questions.length*100}%`;
- answersEl.innerHTML="";
- scale.forEach((label,i)=>{
-  const lab=document.createElement("label");lab.className="answer";
-  const input=document.createElement("input");input.type="radio";input.name="answer";input.value=String(i+1);input.checked=responses[current]===i+1;
-  input.addEventListener("change",()=>{responses[current]=i+1;nextBtn.disabled=false;});
-  const span=document.createElement("span");span.textContent=`${i+1}. ${label}`;
-  lab.append(input,span);answersEl.append(lab);
- });
- prevBtn.disabled=current===0;
- nextBtn.textContent=current===questions.length-1?"結果を見る":"次の質問";
- nextBtn.disabled=responses[current]===null;
-}
-function calculate(){
- const sums={};Object.keys(axes).forEach(k=>{sums[k]={};Object.keys(axes[k].labels).forEach(t=>sums[k][t]=[]);});
- questions.forEach((q,i)=>sums[q[1]][q[2]].push(responses[i]));
- const chosen={}, details={};
- Object.keys(axes).forEach(k=>{
-  const letters=Object.keys(axes[k].labels);
-  const avg={};letters.forEach(l=>avg[l]=sums[k][l].reduce((a,b)=>a+b,0)/sums[k][l].length);
-  const diff=Math.abs(avg[letters[0]]-avg[letters[1]]);
-  chosen[k]=avg[letters[0]]===avg[letters[1]]?letters[0]:letters[0]; // tie resolved consistently below
-  if(avg[letters[0]]!==avg[letters[1]]) chosen[k]=avg[letters[0]]>avg[letters[1]]?letters[0]:letters[1];
-  details[k]={avg,diff,border:diff<0.4};
- });
- const code=chosen.A+chosen.N+chosen.J+chosen.G+chosen.H;
- return {code,chosen,details};
-}
-function showResult(){
- lastResult=calculate();intro.classList.add("hidden");quiz.classList.add("hidden");result.classList.remove("hidden");
- document.getElementById("resultCode").textContent=lastResult.code;
- const [name,desc]=types[lastResult.code];
- document.getElementById("typeName").textContent=name;
- document.getElementById("tagline").textContent=desc;
- document.getElementById("summary").textContent="5つの軸の回答傾向を組み合わせた結果です。";
- const axisResults=document.getElementById("axisResults");axisResults.innerHTML="";
- Object.keys(axes).forEach(k=>{
-  const letter=lastResult.chosen[k], d=lastResult.details[k];
-  const div=document.createElement("div");div.className="result-axis";
-  const title=document.createElement("h3");title.textContent=`${k}｜${axes[k].name}`;
-  const pill=document.createElement("span");pill.className="pill";pill.textContent=`${letter}：${axes[k].labels[letter]}`;
-  const note=document.createElement("p");note.className="muted";note.textContent=`判定差：${d.diff.toFixed(1)}点${d.border?"（境界傾向）":""}`;
-  div.append(title,pill,note);axisResults.append(div);
- });
- window.scrollTo({top:0,behavior:"smooth"});
-}
-function resultText(){
- if(!lastResult)return "";
- const [name,desc]=types[lastResult.code];
- return `5つの軸で知る、自分の傾向診断\nタイプ：${name}\nコード：${lastResult.code}\n${desc}\n\nこの診断は自己理解を目的としたオリジナルの試作版です。科学的に検証された心理検査ではありません。`;
-}
-document.getElementById("startBtn").addEventListener("click",()=>{intro.classList.add("hidden");quiz.classList.remove("hidden");renderQuestion();window.scrollTo({top:0,behavior:"smooth"});});
-prevBtn.addEventListener("click",()=>{if(current>0){current--;renderQuestion();}});
-nextBtn.addEventListener("click",()=>{if(responses[current]===null)return;if(current<questions.length-1){current++;renderQuestion();}else showResult();});
-document.getElementById("restartBtn").addEventListener("click",()=>{current=0;responses=Array(questions.length).fill(null);lastResult=null;result.classList.add("hidden");intro.classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});});
-document.getElementById("copyBtn").addEventListener("click",async()=>{const text=resultText();try{await navigator.clipboard.writeText(text);document.getElementById("copyBtn").textContent="コピーしました";}catch(e){window.prompt("以下の結果をコピーしてください",text);}});
-document.getElementById("shareBtn").addEventListener("click",async()=>{const data={title:"5つの軸で知る、自分の傾向診断",text:resultText(),url:location.href};if(navigator.share){try{await navigator.share(data);}catch(e){}}else{try{await navigator.clipboard.writeText(resultText()+"\n"+location.href);document.getElementById("shareBtn").textContent="共有文をコピーしました";}catch(e){window.prompt("以下の結果をコピーしてください",resultText()+"\n"+location.href);}}});
+
+prevBtn.addEventListener("click", () => {
+  if (current > 0) {
+    current -= 1;
+    renderQuestion();
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  if (responses[current] === null) {
+    return;
+  }
+
+  if (current < questions.length - 1) {
+    current += 1;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+});
+
+document.getElementById("restartBtn")
+  .addEventListener("click", resetQuiz);
+
+copyBtn.addEventListener("click", async () => {
+  if (!lastResult) {
+    return;
+  }
+
+  const text = resultText();
+
+  try {
+    await navigator.clipboard.writeText(text);
+    copyBtn.textContent = "コピーしました";
+  } catch (error) {
+    window.prompt("以下の結果をコピーしてください", text);
+  }
+});
+
+shareBtn.addEventListener("click", async () => {
+  if (!lastResult) {
+    return;
+  }
+
+  const data = {
+    title: "5つの軸で知る、自分の傾向診断",
+    text: resultText()
+  };
+
+  // ローカルファイルのパスは共有文に含めない。
+  if (
+    location.protocol === "https:" ||
+    location.protocol === "http:"
+  ) {
+    data.url = location.href;
+  }
+
+  if (typeof navigator.share === "function") {
+    try {
+      await navigator.share(data);
+      return;
+    } catch (error) {
+      if (error.name === "AbortError") {
+        return;
+      }
+    }
+  }
+
+  const text = data.url
+    ? `${data.text}\n${data.url}`
+    : data.text;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    shareBtn.textContent = "共有文をコピーしました";
+  } catch (error) {
+    window.prompt("以下の結果をコピーしてください", text);
+  }
+});
 </script>
 </body>
 </html>
