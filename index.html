@@ -154,14 +154,14 @@ function showResult(){
 }
 function resultText(){
   if(!lastResult)return "";
-  return ["5つの軸で知る、自分の女装傾向診断",`タイプ：${getTypeName(lastResult)}`,`コード：${lastResult.code}`,hSubtitles[lastResult.chosen.H],"",getDescription(lastResult),"",getSummary(lastResult),"", "【グラフ表示値：0〜100、50は同点】",...axisOrder.map(k=>`${k}：${lastResult.details[k].score.toFixed(1)}（外側：${axes[k].outward}）`),"", "自己理解用の試作版です。科学的に検証された心理検査・医学的診断ではありません。性自認・性的指向・人格を断定するものではありません。"].join("\n");
+  return ["【お遊び】5つの軸で知る自分の女装傾向",`タイプ：${getTypeName(lastResult)}`,`コード：${lastResult.code}`,hSubtitles[lastResult.chosen.H],"",getDescription(lastResult),"",getSummary(lastResult),"", "【グラフ表示値：0〜100、50は同点】",...axisOrder.map(k=>`${k}：${lastResult.details[k].score.toFixed(1)}（外側：${axes[k].outward}）`),"", "自己理解用の試作版です。科学的に検証された心理検査・医学的診断ではありません。性自認・性的指向・人格を断定するものではありません。"].join("\n");
 }
 $("startBtn").addEventListener("click",()=>{current=0;responses=Array(questions.length).fill(null);lastResult=null;shuffleQuestionOrder();$("intro").classList.add("hidden");$("quiz").classList.remove("hidden");renderQuestion();window.scrollTo({top:0,behavior:"smooth"});});
 $("prevBtn").addEventListener("click",()=>{if(current>0){current--;renderQuestion();}});
 $("nextBtn").addEventListener("click",()=>{if(responses[questionOrder[current]]===null)return;if(current<questions.length-1){current++;renderQuestion();}else showResult();});
 $("restartBtn").addEventListener("click",()=>{$("resultIllustration").classList.add("hidden");current=0;responses=Array(questions.length).fill(null);lastResult=null;$("copyBtn").textContent="結果をコピー";$("shareBtn").textContent="共有する";$("result").classList.add("hidden");$("quiz").classList.add("hidden");$("intro").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});});
 $("copyBtn").addEventListener("click",async()=>{if(!lastResult)return;const text=resultText();try{await navigator.clipboard.writeText(text);$("copyBtn").textContent="コピーしました";}catch(e){window.prompt("以下の結果をコピーしてください",text);}});
-$("shareBtn").addEventListener("click",async()=>{if(!lastResult)return;const data={title:"5つの軸で知る、自分の女装傾向診断",text:resultText()};if(["http:","https:"].includes(location.protocol))data.url=location.href;if(typeof navigator.share==="function"){try{await navigator.share(data);return;}catch(e){if(e.name==="AbortError")return;}}const text=data.text+(data.url?"\n"+data.url:"");try{await navigator.clipboard.writeText(text);$("shareBtn").textContent="共有文をコピーしました";}catch(e){window.prompt("以下の結果をコピーしてください",text);}});
+$("shareBtn").addEventListener("click",async()=>{if(!lastResult)return;const data={title:"【お遊び】5つの軸で知る自分の女装傾向",text:resultText()};if(["http:","https:"].includes(location.protocol))data.url=location.href;if(typeof navigator.share==="function"){try{await navigator.share(data);return;}catch(e){if(e.name==="AbortError")return;}}const text=data.text+(data.url?"\n"+data.url:"");try{await navigator.clipboard.writeText(text);$("shareBtn").textContent="共有文をコピーしました";}catch(e){window.prompt("以下の結果をコピーしてください",text);}});
 </script>
 </body>
 </html>
