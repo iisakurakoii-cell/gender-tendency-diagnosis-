@@ -25,7 +25,14 @@ main{width:min(760px,100%);margin:auto;padding:24px 16px 56px}.hero,.panel{backg
 <div id="errorBox" class="hidden" role="alert"></div>
 <section class="panel" id="intro"><h2>チェックする5つの軸</h2><div class="axis-list"><div class="axis"><b>A｜からだの性別らしさ、しっくり度</b><small>C：いまのからだで安心 ／ T：ちょっと気になる・探りたい</small></div><div class="axis"><b>N｜女性らしい見た目へのこだわり</b><small>B：こだわりゆるめ ／ F：とことん磨きたい</small></div><div class="axis"><b>J｜ひとりで満足？ 反応もほしい？</b><small>P：ひとり満足派 ／ O：反応も楽しみたい派</small></div><div class="axis"><b>G｜女性らしい自分のイメージと性的なドキドキ</b><small>I：つながり薄め ／ E：つながり濃いめ</small></div><div class="axis"><b>H｜男としてのプレッシャー</b><small>A：男としてのプレッシャー軽め ／ R：男としてのプレッシャー重め</small></div></div>
 <p class="muted">それぞれの軸で、両側の質問への答えを点数にして平均を見くらべます。点数は、「ぜんぜん当てはまらない」が0点、「あまり」が2点、「どちらともいえない」が3点、「ちょっと」が4点、「すごく当てはまる」が6点。両はしの答えは、ほかより少し重く数えます。ぴったり同点ならX（判定おあずけ）、同点ではないけれど差が0.6点未満なら「境界ぎみ」。0.6点は試作版の目安です。</p>
-<p class="muted">所要時間は約3〜5分。質問は始めるたびにランダムな順番で、1問ずつ出ます。答えはこのページ内で集計されます。任意の投票に同意してボタンを押した場合だけ、結果コードなどを集計用のSupabaseへ送信します。各質問への答えは送信しません。コピーや共有は、あなたが操作したときだけ。各質問への答えは保存されず、ページを再読み込みすると消えます。送信済みの投票は累計に残ります。</p><div class="actions"><button id="startBtn" type="button">さっそくスタート</button></div></section>
+<p class="muted">所要時間は約3〜5分。質問は始めるたびにランダムな順番で、1問ずつ出ます。答えはこのページ内で集計されます。任意の投票に同意してボタンを押した場合だけ、結果コードなどを集計用のSupabaseへ送信します。各質問への答えは送信しません。コピーや共有は、あなたが操作したときだけ。各質問への答えは保存されず、ページを再読み込みすると消えます。送信済みの投票は累計に残ります。</p><section class="panel inner" id="startVoteRanking" aria-labelledby="startVoteRankingTitle">
+<h2 id="startVoteRankingTitle">みんなの投票・トップ3タイプ</h2>
+<p id="startVoteTotal" class="vote-total" aria-live="polite">総投票数を読み込み中…</p>
+<div id="startVoteTopThree"></div>
+<p id="startVoteRankingStatus" class="vote-status" role="status"></p>
+<div class="actions"><button id="startVoteRefresh" class="secondary" type="button">投票結果を更新</button></div>
+<p class="warning">トップ3は32タイプから表示し、同票は同順位です。3位の票数で並んだタイプもすべて表示します。同点の軸を含む診断結果はランキングから除き、総投票数には含めます。任意参加・繰り返し投票可能な延べ投票数であり、人数や社会全体のタイプ分布ではありません。</p>
+</section><div class="actions"><button id="startBtn" type="button">さっそくスタート</button></div></section>
 <section class="panel hidden" id="quiz"><div id="counter" class="muted"></div><div class="progress-wrap"><div id="progress" class="progress"></div></div><div id="questionText" class="question"></div><div id="answers" class="answers" role="radiogroup" aria-labelledby="questionText"></div><div class="actions"><button id="prevBtn" class="secondary" type="button">ひとつ戻る</button><button id="nextBtn" type="button" disabled>つぎへ</button></div></section>
 <section class="panel hidden" id="result" aria-live="polite"><div class="eyebrow">YOUR RESULT</div><div id="resultCode" class="result-code"></div><div id="typeName" class="type-name"></div><div id="resultIllustration" class="result-illustration hidden"><img id="resultImage" alt="" width="512" height="512"></div>
 <section class="panel inner"><h2>5つの軸のレーダーグラフ</h2><div id="radarChart"></div><div class="chart-legend"><span><i class="solid"></i>今回の答え</span><span><i class="dashed"></i>50：両側の平均がぴったり同点</span></div><table><caption>グラフが外側にふくらむと、下の表で示した側（T・F・O・E・R）の質問に「当てはまる」と答えた傾向が強いことを表します。</caption><thead><tr><th scope="col">軸</th><th scope="col">グラフが外側にふくらむと…</th><th scope="col" class="score">表示値</th></tr></thead><tbody id="chartValues"></tbody></table><p class="warning">0〜100は、両側の平均の差を目盛りに直した表示値です。0は反対側にいちばん寄った状態、100は表に書いた側にいちばん寄った状態、50はぴったり同点です。割合やパーセンタイルではありません。50は「中立」や「バランスが良い」という意味ではなく、グラフの大きさも良し悪しや能力の高さを表しません。軸がちがうと、気持ちの強さをそのまま比べることもできません。</p></section>
@@ -198,12 +205,26 @@ async function call(path,body,isVote){
   return await response.json();
  }finally{clearTimeout(timer);}
 }
+function renderStartRanking(values,total){
+ node('startVoteTotal').textContent=`総投票数 ${total.toLocaleString('ja-JP')} 票`;
+ const target=node('startVoteTopThree');target.replaceChildren();
+ const ranked=codes.filter(code=>values[code]>0).sort((a,b)=>values[b]-values[a]||a.localeCompare(b));
+ if(!ranked.length){target.append(make('p','まだ32タイプへの投票はありません。','muted'));return;}
+ let rank=0,previous=null;
+ ranked.forEach((code,index)=>{
+  const count=values[code];if(count!==previous)rank=index+1;previous=count;
+  if(rank>3)return;
+  const row=make('div',undefined,'vote-row'),label=make('div',undefined,'vote-label');
+  label.append(make('span',`${rank}位 ｜ ${code}`,'vote-code'),make('span',name(code),'vote-name'));
+  row.append(label,make('div',`${count.toLocaleString('ja-JP')} 票`,'vote-number'));target.append(row);
+ });
+}
 function renderCounts(data){
  if(!Array.isArray(data))throw new Error('invalid_counts');
  const values=Object.fromEntries([...codes,'XXXXX'].map(c=>[c,0]));
  for(const row of data){const n=Number(row.votes);if(!Object.prototype.hasOwnProperty.call(values,row.result_code)||!Number.isSafeInteger(n)||n<0)throw new Error('invalid_counts');values[row.result_code]+=n;}
  const total=Object.values(values).reduce((a,b)=>a+b,0);if(!Number.isSafeInteger(total))throw new Error('invalid_counts');
- totalText.textContent=`累計 ${total.toLocaleString('ja-JP')} 票`;rows.replaceChildren();
+ totalText.textContent=`累計 ${total.toLocaleString('ja-JP')} 票`;rows.replaceChildren();renderStartRanking(values,total);
  [...codes].sort((a,b)=>values[b]-values[a]||a.localeCompare(b)).concat('XXXXX').forEach(code=>{
   const count=values[code],percent=total?count/total*100:0,row=make('div',undefined,'vote-row'),label=make('div',undefined,'vote-label');
   label.append(make('span',code==='XXXXX'?'同点を含む結果':code,'vote-code'));if(code!=='XXXXX')label.append(make('span',name(code),'vote-name'));
@@ -212,10 +233,17 @@ function renderCounts(data){
  });
 }
 async function refreshCounts(){
- if(loading)return;loading=true;refresh.disabled=true;countsStatus.textContent='集計を読み込み中…';
- try{renderCounts(await call('/rest/v1/rpc/get_quiz_vote_counts',{p_version:VERSION},false));countsStatus.textContent='集計を更新しました。';}
- catch(_){countsStatus.textContent='集計を取得できませんでした。診断結果はそのままご覧いただけます。時間をおいて「集計だけ見る・更新」を押してください。';}
- finally{loading=false;refresh.disabled=false;}
+ if(loading)return;loading=true;refresh.disabled=true;node('startVoteRefresh').disabled=true;
+ countsStatus.textContent='集計を読み込み中…';node('startVoteRankingStatus').textContent='投票結果を読み込み中…';
+ try{
+  renderCounts(await call('/rest/v1/rpc/get_quiz_vote_counts',{p_version:VERSION},false));
+  countsStatus.textContent='集計を更新しました。';
+  node('startVoteRankingStatus').textContent='投票結果を更新しました。';
+ }catch(_){
+  countsStatus.textContent='集計を取得できませんでした。診断結果はそのままご覧いただけます。時間をおいて「集計だけ見る・更新」を押してください。';
+  if(node('startVoteTotal').textContent==='総投票数を読み込み中…')node('startVoteTotal').textContent='総投票数：未取得';
+  node('startVoteRankingStatus').textContent='最新の投票結果を取得できませんでした。時間をおいて「投票結果を更新」を押してください。診断はそのまま開始できます。';
+ }finally{loading=false;refresh.disabled=false;node('startVoteRefresh').disabled=false;}
 }
 async function sendVote(){
  if(busy||!run||!run.code||run.sent||!consent.checked)return;
@@ -240,7 +268,9 @@ consent.addEventListener('change',()=>{voteButton.disabled=busy||!run?.code||run
 voteButton.addEventListener('click',()=>void sendVote());refresh.addEventListener('click',()=>void refreshCounts());
 node('startBtn').addEventListener('click',reset,true);
 node('restartBtn').addEventListener('click',()=>{generation++;run=null;busy=false;consent.checked=false;voteButton.disabled=true;status.textContent='';},true);
+node('startVoteRefresh').addEventListener('click',()=>void refreshCounts());
 window.quizVoting={show};
+void refreshCounts();
 })();
 </script>
 </body>
