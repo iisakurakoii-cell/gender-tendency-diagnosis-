@@ -12,6 +12,8 @@ main{width:min(760px,100%);margin:auto;padding:24px 16px 56px}.hero,.panel{backg
 @media(max-width:520px){main{padding:12px 11px 36px}.hero{padding:23px 17px}.panel{padding:16px}.inner{padding:12px}.axis-list{grid-template-columns:1fr}.actions button{flex:1 1 140px}.type-name{font-size:1.35rem}table{font-size:.8rem}}
 
 .result-illustration{margin:16px auto 20px;text-align:center}.result-illustration img{display:block;width:min(280px,85%);height:auto;max-height:340px;object-fit:contain;margin:0 auto;border-radius:16px}
+
+.vote-consent{display:flex;gap:10px;align-items:flex-start;background:var(--soft,#eee9f8);padding:12px;border-radius:12px;margin:14px 0}.vote-consent input{width:20px;height:20px;flex-shrink:0;margin-top:5px;accent-color:#6654a3}.vote-total{font-size:1.4rem;font-weight:700;color:#6654a3;margin:16px 0}.vote-status{font-size:.9rem;color:#716f68;white-space:pre-line}.vote-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 10px;padding:10px 0;border-bottom:1px solid #e5dfd5}.vote-label{min-width:0}.vote-code{font-weight:700;margin-right:8px}.vote-name{font-size:.85rem;color:#716f68}.vote-number{font-size:.85rem;white-space:nowrap}.vote-track{grid-column:1/-1;height:8px;background:#eee9f8;border-radius:8px;overflow:hidden}.vote-fill{height:100%;background:#8b75bd;border-radius:8px}#quizVoteSection summary{cursor:pointer;color:#6654a3;padding:10px 0}
 </style>
 </head>
 <body>
@@ -23,7 +25,7 @@ main{width:min(760px,100%);margin:auto;padding:24px 16px 56px}.hero,.panel{backg
 <div id="errorBox" class="hidden" role="alert"></div>
 <section class="panel" id="intro"><h2>チェックする5つの軸</h2><div class="axis-list"><div class="axis"><b>A｜からだの性別らしさ、しっくり度</b><small>C：いまのからだで安心 ／ T：ちょっと気になる・探りたい</small></div><div class="axis"><b>N｜女性らしい見た目へのこだわり</b><small>B：こだわりゆるめ ／ F：とことん磨きたい</small></div><div class="axis"><b>J｜ひとりで満足？ 反応もほしい？</b><small>P：ひとり満足派 ／ O：反応も楽しみたい派</small></div><div class="axis"><b>G｜女性らしい自分のイメージと性的なドキドキ</b><small>I：つながり薄め ／ E：つながり濃いめ</small></div><div class="axis"><b>H｜男としてのプレッシャー</b><small>A：男としてのプレッシャー軽め ／ R：男としてのプレッシャー重め</small></div></div>
 <p class="muted">それぞれの軸で、両側の質問への答えを点数にして平均を見くらべます。点数は、「ぜんぜん当てはまらない」が0点、「あまり」が2点、「どちらともいえない」が3点、「ちょっと」が4点、「すごく当てはまる」が6点。両はしの答えは、ほかより少し重く数えます。ぴったり同点ならX（判定おあずけ）、同点ではないけれど差が0.6点未満なら「境界ぎみ」。0.6点は試作版の目安です。</p>
-<p class="muted">所要時間は約3〜5分。質問は始めるたびにランダムな順番で、1問ずつ出ます。答えはこのページの中だけで集計され、勝手にサーバーへ送られることはありません。コピーや共有は、あなたが操作したときだけ。答えは保存されず、ページを再読み込みすると消えます。</p><div class="actions"><button id="startBtn" type="button">さっそくスタート</button></div></section>
+<p class="muted">所要時間は約3〜5分。質問は始めるたびにランダムな順番で、1問ずつ出ます。答えはこのページ内で集計されます。任意の投票に同意してボタンを押した場合だけ、結果コードなどを集計用のSupabaseへ送信します。各質問への答えは送信しません。コピーや共有は、あなたが操作したときだけ。各質問への答えは保存されず、ページを再読み込みすると消えます。送信済みの投票は累計に残ります。</p><div class="actions"><button id="startBtn" type="button">さっそくスタート</button></div></section>
 <section class="panel hidden" id="quiz"><div id="counter" class="muted"></div><div class="progress-wrap"><div id="progress" class="progress"></div></div><div id="questionText" class="question"></div><div id="answers" class="answers" role="radiogroup" aria-labelledby="questionText"></div><div class="actions"><button id="prevBtn" class="secondary" type="button">ひとつ戻る</button><button id="nextBtn" type="button" disabled>つぎへ</button></div></section>
 <section class="panel hidden" id="result" aria-live="polite"><div class="eyebrow">YOUR RESULT</div><div id="resultCode" class="result-code"></div><div id="typeName" class="type-name"></div><div id="resultIllustration" class="result-illustration hidden"><img id="resultImage" alt="" width="512" height="512"></div>
 <section class="panel inner"><h2>5つの軸のレーダーグラフ</h2><div id="radarChart"></div><div class="chart-legend"><span><i class="solid"></i>今回の答え</span><span><i class="dashed"></i>50：両側の平均がぴったり同点</span></div><table><caption>グラフが外側にふくらむと、下の表で示した側（T・F・O・E・R）の質問に「当てはまる」と答えた傾向が強いことを表します。</caption><thead><tr><th scope="col">軸</th><th scope="col">グラフが外側にふくらむと…</th><th scope="col" class="score">表示値</th></tr></thead><tbody id="chartValues"></tbody></table><p class="warning">0〜100は、両側の平均の差を目盛りに直した表示値です。0は反対側にいちばん寄った状態、100は表に書いた側にいちばん寄った状態、50はぴったり同点です。割合やパーセンタイルではありません。50は「中立」や「バランスが良い」という意味ではなく、グラフの大きさも良し悪しや能力の高さを表しません。軸がちがうと、気持ちの強さをそのまま比べることもできません。</p></section>
@@ -141,7 +143,7 @@ function showResult(){
   $("resultCode").textContent=lastResult.code;$("typeName").textContent=getTypeName(lastResult);showResultIllustration(lastResult);
   drawRadarChart(lastResult);$("story").replaceChildren();
   getDescription(lastResult).split("\n\n").forEach(text=>{const p=document.createElement("p");p.textContent=text;$("story").append(p);});
-  $("summary").textContent=getSummary(lastResult);$("axisResults").replaceChildren();
+  $("summary").textContent=getSummary(lastResult);window.quizVoting?.show(lastResult);$("axisResults").replaceChildren();
   axisOrder.forEach(k=>{
     const d=lastResult.details[k],[l,r]=axes[k].letters,letter=lastResult.chosen[k];
     const box=document.createElement("div");box.className="result-axis";
@@ -162,6 +164,84 @@ $("nextBtn").addEventListener("click",()=>{if(responses[questionOrder[current]]=
 $("restartBtn").addEventListener("click",()=>{$("resultIllustration").classList.add("hidden");current=0;responses=Array(questions.length).fill(null);lastResult=null;$("copyBtn").textContent="結果をコピー";$("shareBtn").textContent="共有する";$("result").classList.add("hidden");$("quiz").classList.add("hidden");$("intro").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});});
 $("copyBtn").addEventListener("click",async()=>{if(!lastResult)return;const text=resultText();try{await navigator.clipboard.writeText(text);$("copyBtn").textContent="コピーしました";}catch(e){window.prompt("下の結果をコピーしてください",text);}});
 $("shareBtn").addEventListener("click",async()=>{if(!lastResult)return;const data={title:"【お遊び】5つの軸でみる、わたしの女装傾向",text:resultText()};if(["http:","https:"].includes(location.protocol))data.url=location.href;if(typeof navigator.share==="function"){try{await navigator.share(data);return;}catch(e){if(e.name==="AbortError")return;}}const text=data.text+(data.url?"\n"+data.url:"");try{await navigator.clipboard.writeText(text);$("shareBtn").textContent="シェア用の文章をコピーしました";}catch(e){window.prompt("下の結果をコピーしてください",text);}});
+</script>
+<script>
+(() => {
+'use strict';
+const API='https://vhgvjiedufhzxjtrdqpw.supabase.co';
+const KEY='sb_publishable_pgL75kQrFxmxuz0mCyYkCw_KI0nFlJF';
+const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoZ3ZqaWVkdWZoenhqdHJkcXB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MTE0NjEsImV4cCI6MjEwNzk4NzQ2MX0.4HNT-2lzKi88yzrO_EuZ-z2f8xcn_eO3zel2qBShCVM';
+const VERSION='v1';
+const node=id=>document.getElementById(id);
+const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
+const codes=Object.keys(types);
+let run=null,busy=false,loading=false,generation=0;
+const section=make('section',undefined,'panel inner');section.id='quizVoteSection';
+section.append(make('h2','みんなの診断結果に参加する'),make('p','この結果で、集計に1票を追加しませんか？ 再診断するたびに追加できます。人数ではなく「延べ投票数」です。','muted'));
+const current=make('p','','pill');section.append(current);
+const label=make('label',undefined,'vote-consent'),consent=make('input');consent.type='checkbox';
+label.append(consent,make('span','結果コードを集計用のSupabaseへ送信することに同意します。コードから、からだの感覚や性的な反応に関する判定も読み取れます。氏名・SNSアカウント・各質問の回答は送信しません。'));
+section.append(label,make('p','保存するのは結果コード、診断ごとのランダムID、診断版、受付日時です。公開するのは合計票数だけです。通信に伴うIPアドレス等は、サービスのログに残る場合があります。','warning'));
+const actions=make('div',undefined,'actions'),voteButton=make('button','この結果で投票する'),refresh=make('button','集計だけ見る・更新','secondary');
+voteButton.type=refresh.type='button';voteButton.disabled=true;actions.append(voteButton,refresh);section.append(actions);
+const status=make('p','','vote-status');status.setAttribute('role','status');section.append(status);
+const totalText=make('p','累計を読み込みます','vote-total'),countsStatus=make('p','','vote-status');section.append(totalText,countsStatus);
+const details=make('details');details.append(make('summary','32タイプと同点結果の内訳を見る'));const rows=make('div');details.append(rows);section.append(details,make('p','同点を含む結果は、ひとつの区分にまとめます。割合の分母は同点を含む全投票です。任意参加・繰り返し投票可能なので、社会全体や全利用者のタイプ分布を示す統計ではありません。質問・採点を変えた場合は、別バージョンとして集計します。','warning'));
+node('result').append(section);
+function reset(){generation++;run={id:crypto.randomUUID(),code:'',sent:false};busy=false;consent.checked=false;status.textContent='';voteButton.textContent='この結果で投票する';voteButton.disabled=true;}
+function name(code){return code==='XXXXX'?'同点を含む結果':types[code]?.name||code;}
+async function call(path,body,isVote){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+ try{
+  const response=await fetch(API+path,{method:'POST',headers:isVote?{'Content-Type':'application/json',apikey:ANON,Authorization:'Bearer '+ANON}:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(body),signal:controller.signal,cache:'no-store',credentials:'omit'});
+  if(!response.ok)throw new Error(response.status===429?'too_many':'network');
+  return await response.json();
+ }finally{clearTimeout(timer);}
+}
+function renderCounts(data){
+ if(!Array.isArray(data))throw new Error('invalid_counts');
+ const values=Object.fromEntries([...codes,'XXXXX'].map(c=>[c,0]));
+ for(const row of data){const n=Number(row.votes);if(!Object.prototype.hasOwnProperty.call(values,row.result_code)||!Number.isSafeInteger(n)||n<0)throw new Error('invalid_counts');values[row.result_code]+=n;}
+ const total=Object.values(values).reduce((a,b)=>a+b,0);if(!Number.isSafeInteger(total))throw new Error('invalid_counts');
+ totalText.textContent=`累計 ${total.toLocaleString('ja-JP')} 票`;rows.replaceChildren();
+ [...codes].sort((a,b)=>values[b]-values[a]||a.localeCompare(b)).concat('XXXXX').forEach(code=>{
+  const count=values[code],percent=total?count/total*100:0,row=make('div',undefined,'vote-row'),label=make('div',undefined,'vote-label');
+  label.append(make('span',code==='XXXXX'?'同点を含む結果':code,'vote-code'));if(code!=='XXXXX')label.append(make('span',name(code),'vote-name'));
+  const bar=make('div',undefined,'vote-track'),fill=make('div',undefined,'vote-fill');fill.style.width=percent+'%';bar.append(fill);
+  row.append(label,make('div',`${count.toLocaleString('ja-JP')}票（${percent.toFixed(1)}%）`,'vote-number'),bar);rows.append(row);
+ });
+}
+async function refreshCounts(){
+ if(loading)return;loading=true;refresh.disabled=true;countsStatus.textContent='集計を読み込み中…';
+ try{renderCounts(await call('/rest/v1/rpc/get_quiz_vote_counts',{p_version:VERSION},false));countsStatus.textContent='集計を更新しました。';}
+ catch(_){countsStatus.textContent='集計を取得できませんでした。診断結果はそのままご覧いただけます。時間をおいて「集計だけ見る・更新」を押してください。';}
+ finally{loading=false;refresh.disabled=false;}
+}
+async function sendVote(){
+ if(busy||!run||!run.code||run.sent||!consent.checked)return;
+ const active=run,token=generation;busy=true;voteButton.disabled=true;status.textContent='投票を送信中…';
+ try{
+  const data=await call('/functions/v1/submit-quiz-vote',{diagnosis_id:active.id,result_code:active.code,quiz_version:VERSION},true);
+  if(data?.ok!==true||!['recorded','already_recorded'].includes(data.status))throw new Error('network');
+  active.sent=true;
+  if(token===generation){status.textContent=data.status==='recorded'?'投票しました。ご協力ありがとうございます！':'この診断結果の投票は、すでに受け付けています。';voteButton.textContent='投票済み';}
+  if(loading){setTimeout(()=>void refreshCounts(),500);}else{void refreshCounts();}
+ }catch(error){if(token===generation)status.textContent=error.message==='too_many'?'短時間の送信が多いため、少し待ってからお試しください。':'通信を確認できませんでした。同じボタンで再試行できます。同じ診断IDは重複集計しません。';}
+ finally{if(token===generation){busy=false;voteButton.disabled=active.sent||!consent.checked;}}
+}
+function show(data){
+ if(!run)reset();
+ if(!/^[CTX][BFX][POX][IEX][ARX]$/.test(data.code))return;
+ if(run.code && run.code!==data.code)reset();
+ run.code=data.code;current.textContent=`${data.code} ｜ ${data.code.includes('X')?'同点を含む結果':name(data.code)}`;
+ voteButton.disabled=busy||run.sent||!consent.checked;void refreshCounts();
+}
+consent.addEventListener('change',()=>{voteButton.disabled=busy||!run?.code||run.sent||!consent.checked;});
+voteButton.addEventListener('click',()=>void sendVote());refresh.addEventListener('click',()=>void refreshCounts());
+node('startBtn').addEventListener('click',reset,true);
+node('restartBtn').addEventListener('click',()=>{generation++;run=null;busy=false;consent.checked=false;voteButton.disabled=true;status.textContent='';},true);
+window.quizVoting={show};
+})();
 </script>
 </body>
 </html>
