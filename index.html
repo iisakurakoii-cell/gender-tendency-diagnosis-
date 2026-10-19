@@ -25,7 +25,7 @@ main{width:min(760px,100%);margin:auto;padding:24px 16px 56px}.hero,.panel{backg
 <p class="muted">それぞれの軸で、両側の質問への答えを点数にして平均を見くらべます。点数は、「ぜんぜん当てはまらない」が0点、「あまり」が2点、「どちらともいえない」が3点、「ちょっと」が4点、「すごく当てはまる」が6点。両はしの答えは、ほかより少し重く数えます。ぴったり同点ならX（判定おあずけ）、同点ではないけれど差が0.6点未満なら「境界ぎみ」。0.6点は試作版の目安です。</p>
 <p class="muted">所要時間は約3〜5分。質問は始めるたびにランダムな順番で、1問ずつ出ます。答えはこのページの中だけで集計され、勝手にサーバーへ送られることはありません。コピーや共有は、あなたが操作したときだけ。答えは保存されず、ページを再読み込みすると消えます。</p><div class="actions"><button id="startBtn" type="button">さっそくスタート</button></div></section>
 <section class="panel hidden" id="quiz"><div id="counter" class="muted"></div><div class="progress-wrap"><div id="progress" class="progress"></div></div><div id="questionText" class="question"></div><div id="answers" class="answers" role="radiogroup" aria-labelledby="questionText"></div><div class="actions"><button id="prevBtn" class="secondary" type="button">ひとつ戻る</button><button id="nextBtn" type="button" disabled>つぎへ</button></div></section>
-<section class="panel hidden" id="result" aria-live="polite"><div class="eyebrow">YOUR RESULT</div><div id="resultCode" class="result-code"></div><div id="typeName" class="type-name"></div><div id="resultIllustration" class="result-illustration hidden"><img id="resultImage" alt="" width="512" height="512"></div><div class="h-note"><div id="hSubtitle"></div><small id="hStatus"></small></div>
+<section class="panel hidden" id="result" aria-live="polite"><div class="eyebrow">YOUR RESULT</div><div id="resultCode" class="result-code"></div><div id="typeName" class="type-name"></div><div id="resultIllustration" class="result-illustration hidden"><img id="resultImage" alt="" width="512" height="512"></div>
 <section class="panel inner"><h2>5つの軸のレーダーグラフ</h2><div id="radarChart"></div><div class="chart-legend"><span><i class="solid"></i>今回の答え</span><span><i class="dashed"></i>50：両側の平均がぴったり同点</span></div><table><caption>グラフが外側にふくらむと、下の表で示した側（T・F・O・E・R）の質問に「当てはまる」と答えた傾向が強いことを表します。</caption><thead><tr><th scope="col">軸</th><th scope="col">グラフが外側にふくらむと…</th><th scope="col" class="score">表示値</th></tr></thead><tbody id="chartValues"></tbody></table><p class="warning">0〜100は、両側の平均の差を目盛りに直した表示値です。0は反対側にいちばん寄った状態、100は表に書いた側にいちばん寄った状態、50はぴったり同点です。割合やパーセンタイルではありません。50は「中立」や「バランスが良い」という意味ではなく、グラフの大きさも良し悪しや能力の高さを表しません。軸がちがうと、気持ちの強さをそのまま比べることもできません。</p></section>
 <section class="panel inner"><h2>あなたにおすすめの女装の楽しみ方</h2><div id="story" class="story"></div><p class="warning">この文章は、今回の答えの組み合わせに合わせた読み物です。「ちょっと違うかも」と思ったら、採り入れなくてまったく大丈夫。</p></section>
 <p id="summary" class="muted result-note"></p><div class="actions"><button id="copyBtn" type="button">結果をコピーする</button><button id="shareBtn" class="secondary" type="button">シェアする</button><button id="restartBtn" class="secondary" type="button">もう一度あそぶ</button></div><p class="warning">シェアする文章には、からだの感覚や性的なドキドキに関する結果もふくまれます。内容とシェア先をよく確認してからどうぞ。グラフの画像はシェアされません。</p>
@@ -42,7 +42,6 @@ const WEIGHT = [0,2,3,4,6];
 const MAXW = 6;
 const axisOrder = ["A","N","J","G","H"];
 const scale = ["ぜんぜん当てはまらない","あまり当てはまらない","どちらともいえない","ちょっと当てはまる","すごく当てはまる"];
-const hSubtitles = {A:"男としてのプレッシャーは、軽めのタイプ",R:"男としてのプレッシャーを、重めに感じやすいタイプ",X:"男としてのプレッシャーは、同点だったので判定おあずけ"};
 const $ = id => document.getElementById(id);
 let current=0, responses=Array(questions.length).fill(null), lastResult=null;
 let questionOrder=Array.from({length:questions.length},(_,i)=>i);
@@ -140,8 +139,6 @@ function showResultIllustration(data){
 function showResult(){
   lastResult=calculate();$("intro").classList.add("hidden");$("quiz").classList.add("hidden");$("result").classList.remove("hidden");
   $("resultCode").textContent=lastResult.code;$("typeName").textContent=getTypeName(lastResult);showResultIllustration(lastResult);
-  $("hSubtitle").textContent=hSubtitles[lastResult.chosen.H];
-  $("hStatus").textContent=lastResult.details.H.tie?"同点だったので、A・Rのどちらにも分けていません。":lastResult.details.H.border?"境界ぎみ：両側の平均の差が小さめの結果です。":"今回の答えでの、両側の平均のくらべっこです。";
   drawRadarChart(lastResult);$("story").replaceChildren();
   getDescription(lastResult).split("\n\n").forEach(text=>{const p=document.createElement("p");p.textContent=text;$("story").append(p);});
   $("summary").textContent=getSummary(lastResult);$("axisResults").replaceChildren();
@@ -157,7 +154,7 @@ function showResult(){
 }
 function resultText(){
   if(!lastResult)return "";
-  return ["【お遊び】5つの軸でみる、わたしの女装傾向",`タイプ：${getTypeName(lastResult)}`,`コード：${lastResult.code}`,hSubtitles[lastResult.chosen.H],"",getDescription(lastResult),"",getSummary(lastResult),"", "【グラフの表示値：0〜100、50はぴったり同点】",...axisOrder.map(k=>`${k}：${lastResult.details[k].score.toFixed(1)}（外側：${axes[k].outward}）`),"", "自分をちょっと知るための試作版です。科学的に確かめられた心理検査でも医学的な診断でもなく、性自認・性的指向・性格を決めつけるものではありません。"].join("\n");
+  return ["【お遊び】5つの軸でみる、わたしの女装傾向",`タイプ：${getTypeName(lastResult)}`,`コード：${lastResult.code}`,getDescription(lastResult),"",getSummary(lastResult),"", "【グラフの表示値：0〜100、50はぴったり同点】",...axisOrder.map(k=>`${k}：${lastResult.details[k].score.toFixed(1)}（外側：${axes[k].outward}）`),"", "自分をちょっと知るための試作版です。科学的に確かめられた心理検査でも医学的な診断でもなく、性自認・性的指向・性格を決めつけるものではありません。"].join("\n");
 }
 $("startBtn").addEventListener("click",()=>{current=0;responses=Array(questions.length).fill(null);lastResult=null;shuffleQuestionOrder();$("intro").classList.add("hidden");$("quiz").classList.remove("hidden");renderQuestion();window.scrollTo({top:0,behavior:"smooth"});});
 $("prevBtn").addEventListener("click",()=>{if(current>0){current--;renderQuestion();}});
