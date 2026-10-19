@@ -22,7 +22,7 @@ main{width:min(760px,100%);margin:auto;padding:24px 16px 56px}.hero,.panel{backg
 <p class="warning">自分をちょっと知るための、オリジナルの試作版です。科学的に確かめられた心理検査でも医学的な診断でもなく、性自認・性的指向・性格を決めつけるものでもありません。性的な内容の質問がふくまれます。解説は、答えをもとにした「楽しみ方のヒント」であって、あなたの性格や行動を言い当てるものではありません。</p></section>
 <div id="errorBox" class="hidden" role="alert"></div>
 <section class="panel" id="intro"><h2>チェックする5つの軸</h2><div class="axis-list"><div class="axis"><b>A｜からだの性別らしさ、しっくり度</b><small>C：いまのからだで安心 ／ T：ちょっと気になる・探りたい</small></div><div class="axis"><b>N｜女性らしい見た目へのこだわり</b><small>B：こだわりゆるめ ／ F：とことん磨きたい</small></div><div class="axis"><b>J｜ひとりで満足？ 反応もほしい？</b><small>P：ひとり満足派 ／ O：反応も楽しみたい派</small></div><div class="axis"><b>G｜女性らしい自分のイメージと性的なドキドキ</b><small>I：つながり薄め ／ E：つながり濃いめ</small></div><div class="axis"><b>H｜男としてのプレッシャー</b><small>A：男としてのプレッシャー軽め ／ R：男としてのプレッシャー重め</small></div></div>
-<p class="muted">それぞれの軸で、両側の質問への答えの平均を見くらべます。ぴったり同点ならX（判定おあずけ）、同点ではないけれど差が0.4点未満なら「境界ぎみ」。0.4点は試作版の目安です。</p>
+<p class="muted">それぞれの軸で、両側の質問への答えを点数にして平均を見くらべます。点数は、「ぜんぜん当てはまらない」が0点、「あまり」が2点、「どちらともいえない」が3点、「ちょっと」が4点、「すごく当てはまる」が6点。両はしの答えは、ほかより少し重く数えます。ぴったり同点ならX（判定おあずけ）、同点ではないけれど差が0.6点未満なら「境界ぎみ」。0.6点は試作版の目安です。</p>
 <p class="muted">所要時間は約3〜5分。質問は始めるたびにランダムな順番で、1問ずつ出ます。答えはこのページの中だけで集計され、勝手にサーバーへ送られることはありません。コピーや共有は、あなたが操作したときだけ。答えは保存されず、ページを再読み込みすると消えます。</p><div class="actions"><button id="startBtn" type="button">さっそくスタート</button></div></section>
 <section class="panel hidden" id="quiz"><div id="counter" class="muted"></div><div class="progress-wrap"><div id="progress" class="progress"></div></div><div id="questionText" class="question"></div><div id="answers" class="answers" role="radiogroup" aria-labelledby="questionText"></div><div class="actions"><button id="prevBtn" class="secondary" type="button">ひとつ戻る</button><button id="nextBtn" type="button" disabled>つぎへ</button></div></section>
 <section class="panel hidden" id="result" aria-live="polite"><div class="eyebrow">YOUR RESULT</div><div id="resultCode" class="result-code"></div><div id="typeName" class="type-name"></div><div id="resultIllustration" class="result-illustration hidden"><img id="resultImage" alt="" width="512" height="512"></div><div class="h-note"><div id="hSubtitle"></div><small id="hStatus"></small></div>
@@ -38,6 +38,8 @@ const types = {"CBPIA": {"name": "のんびりマイペースさん", "descripti
 
 "use strict";
 const PER = 3;
+const WEIGHT = [0,2,3,4,6];
+const MAXW = 6;
 const axisOrder = ["A","N","J","G","H"];
 const scale = ["ぜんぜん当てはまらない","あまり当てはまらない","どちらともいえない","ちょっと当てはまる","すごく当てはまる"];
 const hSubtitles = {A:"男としてのプレッシャーは、軽めのタイプ",R:"男としてのプレッシャーを、重めに感じやすいタイプ",X:"男としてのプレッシャーは、同点だったので判定おあずけ"};
@@ -73,13 +75,13 @@ function calculate(values=responses){
   if(values.length!==questions.length||values.some(v=>!Number.isInteger(v)||v<1||v>5))throw new Error("すべての質問に回答してください。");
   const totals={},counts={},chosen={},details={};
   axisOrder.forEach(k=>{totals[k]={};counts[k]={};axes[k].letters.forEach(l=>{totals[k][l]=0;counts[k][l]=0;});});
-  questions.forEach((q,i)=>{totals[q[1]][q[2]]+=values[i];counts[q[1]][q[2]]++;});
+  questions.forEach((q,i)=>{totals[q[1]][q[2]]+=WEIGHT[values[i]-1];counts[q[1]][q[2]]++;});
   axisOrder.forEach(k=>{
     const [left,right]=axes[k].letters;
     if(counts[k][left]!==PER||counts[k][right]!==PER)throw new Error(`${k}軸の設問数を確認してください。`);
     const signed=totals[k][left]-totals[k][right],absolute=Math.abs(signed);
     chosen[k]=signed===0?"X":signed>0?left:right;
-    details[k]={avg:{[left]:totals[k][left]/PER,[right]:totals[k][right]/PER},diff:absolute/PER,tie:signed===0,border:absolute>0&&absolute/PER<0.4,score:50-signed*(12.5/PER)};
+    details[k]={avg:{[left]:totals[k][left]/PER,[right]:totals[k][right]/PER},diff:absolute/PER,tie:signed===0,border:absolute>0&&absolute/PER<0.6,score:50-signed*(50/(PER*MAXW))};
   });
   return {code:axisOrder.map(k=>chosen[k]).join(""),chosen,details};
 }
@@ -148,7 +150,7 @@ function showResult(){
     const box=document.createElement("div");box.className="result-axis";
     const h=document.createElement("h3");h.textContent=`${k}｜${axes[k].name}`;
     const pill=document.createElement("span");pill.className="pill";pill.textContent=d.tie?"X：同点・判定おあずけ":`${letter}：${axes[k].labels[letter]}`;
-    const p=document.createElement("p");p.className="muted";p.textContent=`答えの平均（1〜5点）：${l}側 ${d.avg[l].toFixed(1)}点 ／ ${r}側 ${d.avg[r].toFixed(1)}点`;
+    const p=document.createElement("p");p.className="muted";p.textContent=`答えの平均（0〜6点）：${l}側 ${d.avg[l].toFixed(1)}点 ／ ${r}側 ${d.avg[r].toFixed(1)}点`;
     const note=document.createElement("p");note.className="muted";note.textContent=`平均の差：${d.diff.toFixed(1)}点`+(d.tie?"（同点・判定おあずけ）":d.border?"（境界ぎみ）":"");
     box.append(h,pill,p,note);$("axisResults").append(box);
   });window.scrollTo({top:0,behavior:"smooth"});
